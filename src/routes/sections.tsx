@@ -43,10 +43,9 @@ export function Router() {
         </DashboardLayout>
       ),
       children: [
-        { element: <HomePage />, index: true },
-        { path: 'user', element: <UserPage /> },
-        { path: 'products', element: <ProductsPage /> },
-        { path: 'blog', element: <BlogPage /> },
+        { element: <UserPage />, index: true },
+        { path: 'ngoai-gio-don-vi', element: <ProductsPage /> },
+        { path: 'ngoai-gio-ca-nhan', element: <BlogPage /> },
       ],
     },
     {
