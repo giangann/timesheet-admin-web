@@ -11,9 +11,9 @@ import { useRouter } from 'src/routes/hooks';
 
 import { useSnackbar } from 'notistack';
 import { Iconify } from 'src/components/iconify';
-import { postApi } from 'src/services/api';
 
 import { useForm } from 'react-hook-form';
+import { useAuth } from 'src/hooks/use-auth';
 import { TCredentials } from 'src/types/auth';
 // ----------------------------------------------------------------------
 
@@ -21,13 +21,14 @@ export function SignInView() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
+  const { signIn } = useAuth();
 
   const { handleSubmit, register } = useForm<TCredentials>();
 
   const handleSignIn = useCallback(
     async (values: TCredentials) => {
       try {
-        const signInRes = await postApi('/auth/login', values);
+        const signInRes = await signIn(values);
 
         if (signInRes.statusCode === 200) {
           enqueueSnackbar('Đăng nhập thành công', { variant: 'success' });
@@ -39,7 +40,7 @@ export function SignInView() {
         enqueueSnackbar(error.message, { variant: 'error' });
       }
     },
-    [router, enqueueSnackbar]
+    [router, enqueueSnackbar, signIn]
   );
 
   const renderForm = (

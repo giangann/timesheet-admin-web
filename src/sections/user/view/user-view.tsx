@@ -12,6 +12,8 @@ import TablePagination from '@mui/material/TablePagination';
 import { _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 
+import { useAuth } from 'src/hooks/use-auth';
+import { useSnackbar } from 'notistack';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 
@@ -39,6 +41,23 @@ export function UserView() {
 
   const notFound = !dataFiltered.length && !!filterName;
 
+  const { enqueueSnackbar } = useSnackbar();
+  const { verifyToken } = useAuth();
+  const onCheck = async () => {
+    try {
+      const verifyResponse = await verifyToken();
+
+      if (verifyResponse.statusCode === 200) {
+        enqueueSnackbar('ok', { variant: 'success' });
+      } else {
+        enqueueSnackbar(verifyResponse.error, { variant: 'error' });
+      }
+    } catch (error: any) {
+      console.log('error', error);
+      enqueueSnackbar(error.message, { variant: 'error' });
+    }
+  };
+
   return (
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
@@ -49,6 +68,7 @@ export function UserView() {
           variant="contained"
           color="inherit"
           startIcon={<Iconify icon="mingcute:add-line" />}
+          onClick={onCheck}
         >
           Tạo mới
         </Button>

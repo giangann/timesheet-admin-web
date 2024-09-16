@@ -10,6 +10,8 @@ const baseUrl = `${apiDomain}${apiPrefix}`;
 export const getApi = async (endpoint: string, params?: UnknownObj) => {
   const reqHeader = new Headers();
   reqHeader.append('Authorization', `Bearer ${_bearerToken}`);
+  reqHeader.append('Content-Type', 'application/json');
+  reqHeader.append('ngrok-skip-browser-warning', '69420');
 
   const queryString = fParamsToQueryString(params);
   const url = `${baseUrl}${endpoint}${queryString}`;

@@ -8,16 +8,19 @@ import { ThemeProvider } from 'src/theme/theme-provider';
 
 import { SnackbarProvider } from 'notistack';
 
+import { AuthProvider } from './contexts/auth-context';
 // ----------------------------------------------------------------------
 
 export default function App() {
   useScrollToTop();
 
   return (
-    <ThemeProvider>
-      <SnackbarProvider maxSnack={3} disableWindowBlurListener>
-        <Router />
-      </SnackbarProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <SnackbarProvider maxSnack={3} disableWindowBlurListener>
+          <Router />
+        </SnackbarProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
