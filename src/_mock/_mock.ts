@@ -230,3 +230,6 @@ export const _productNames = (index: number) =>
     'Nike React Art3mis',
     'Nike React Infinity Run Flyknit A.I.R. Chaz Bear',
   ][index];
+
+export const _bearerToken =
+  'eyJhbGciOiJIUzI1NiJ9.eyJhZGRyZXNzIjoiTm8gYWRkIiwicm9sZSI6IlbEg24gdGjGsCIsInBob25lIjoiMDAwMDAwMDAwMDAiLCJuYW1lIjoiZGF4dXRpIiwiZW1haWwiOiJkYXh1dGlAZ21haWwuY29tIiwic3ViIjoiMDEyMzQ1Njc4OSIsImlhdCI6MTcyNjQ2NDQxOCwiZXhwIjoxNzI2NTUwODE4fQ.UPSxA8nIV8KLE57sfpYRwwmrR6AFa4REbah5l4SqT0g';

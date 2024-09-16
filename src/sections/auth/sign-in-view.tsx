@@ -12,6 +12,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { useRouter } from 'src/routes/hooks';
 
 import { Iconify } from 'src/components/iconify';
+import { getApi, postApi } from 'src/services/api';
 
 // ----------------------------------------------------------------------
 
@@ -20,8 +21,18 @@ export function SignInView() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignIn = useCallback(() => {
-    router.push('/');
+  const handleSignIn = useCallback(async () => {
+    try {
+      const url = 'https://sproven-incredibly-redbird.ngrok-free.app/api/v1/auth/login';
+      const credentials = { identifyCard: '0123456789', password: '!Daxuti01011970' };
+
+      const signInRes = await postApi(url, credentials);
+      console.log('signInRes', signInRes);
+
+      router.push('/');
+    } catch (error: any) {
+      alert(error.message)
+    }
   }, [router]);
 
   const renderForm = (
