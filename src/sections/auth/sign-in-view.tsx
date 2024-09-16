@@ -1,18 +1,17 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
-import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
-import Divider from '@mui/material/Divider';
-import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 import { useRouter } from 'src/routes/hooks';
 
+import { useSnackbar } from 'notistack';
 import { Iconify } from 'src/components/iconify';
-import { getApi, postApi } from 'src/services/api';
+import { postApi } from 'src/services/api';
 
 // ----------------------------------------------------------------------
 
@@ -21,9 +20,11 @@ export function SignInView() {
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const { enqueueSnackbar } = useSnackbar();
+
   const handleSignIn = useCallback(async () => {
     try {
-      const url = 'https://sproven-incredibly-redbird.ngrok-free.app/api/v1/auth/login';
+      const url = 'https://proven-incredibly-redbird.ngrok-free.app/api/v1/auth/login';
       const credentials = { identifyCard: '0123456789', password: '!Daxuti01011970' };
 
       const signInRes = await postApi(url, credentials);
@@ -31,9 +32,9 @@ export function SignInView() {
 
       router.push('/');
     } catch (error: any) {
-      alert(error.message)
+      enqueueSnackbar(error.message, { variant: 'error' });
     }
-  }, [router]);
+  }, [router, enqueueSnackbar]);
 
   const renderForm = (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
