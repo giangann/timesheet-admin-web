@@ -1,0 +1,1 @@
+import{j as e,B as i,c as r,H as t}from"./index-CXhcBOst.js";import{C as s}from"./config-global-Cd4ORgpa.js";function n(){return e.jsx(i,{children:e.jsx(r,{children:"Time out out working time"})})}function m(){return e.jsxs(e.Fragment,{children:[e.jsx(t,{children:e.jsxs("title",{children:[" ",`Ngoài giờ đơn vị - ${s.appName}`]})}),e.jsx(n,{})]})}export{m as default};
