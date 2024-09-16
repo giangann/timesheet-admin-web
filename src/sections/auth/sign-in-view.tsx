@@ -13,34 +13,40 @@ import { useSnackbar } from 'notistack';
 import { Iconify } from 'src/components/iconify';
 import { postApi } from 'src/services/api';
 
+import { useForm } from 'react-hook-form';
+import { TCredentials } from 'src/types/auth';
 // ----------------------------------------------------------------------
 
 export function SignInView() {
-  const router = useRouter();
-
   const [showPassword, setShowPassword] = useState(false);
-
+  const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
 
-  const handleSignIn = useCallback(async () => {
-    try {
-      const url = 'https://proven-incredibly-redbird.ngrok-free.app/api/v1/auth/login';
-      const credentials = { identifyCard: '0123456789', password: '!Daxuti01011970' };
+  const { handleSubmit, register } = useForm<TCredentials>();
 
-      const signInRes = await postApi(url, credentials);
-      console.log('signInRes', signInRes);
+  const handleSignIn = useCallback(
+    async (values: TCredentials) => {
+      try {
+        const signInRes = await postApi('/auth/login', values);
 
-      router.push('/');
-    } catch (error: any) {
-      enqueueSnackbar(error.message, { variant: 'error' });
-    }
-  }, [router, enqueueSnackbar]);
+        if (signInRes.statusCode === 200) {
+          enqueueSnackbar('Đăng nhập thành công', { variant: 'success' });
+          router.push('/');
+        } else {
+          enqueueSnackbar(signInRes.error, { variant: 'error' });
+        }
+      } catch (error: any) {
+        enqueueSnackbar(error.message, { variant: 'error' });
+      }
+    },
+    [router, enqueueSnackbar]
+  );
 
   const renderForm = (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
       <TextField
+        {...register('identifyCard')}
         fullWidth
-        name="identifyCard"
         label="Số CCCD"
         placeholder="Nhập số CCCD"
         InputLabelProps={{ shrink: true }}
@@ -49,7 +55,7 @@ export function SignInView() {
 
       <TextField
         fullWidth
-        name="password"
+        {...register('password')}
         label="Mật khẩu"
         placeholder="Nhập mật khẩu"
         InputLabelProps={{ shrink: true }}
@@ -72,7 +78,7 @@ export function SignInView() {
         type="submit"
         color="inherit"
         variant="contained"
-        onClick={handleSignIn}
+        onClick={handleSubmit(handleSignIn)}
       >
         Đăng nhập
       </LoadingButton>

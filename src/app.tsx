@@ -15,7 +15,7 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <SnackbarProvider maxSnack={3}>
+      <SnackbarProvider maxSnack={3} disableWindowBlurListener>
         <Router />
       </SnackbarProvider>
     </ThemeProvider>
