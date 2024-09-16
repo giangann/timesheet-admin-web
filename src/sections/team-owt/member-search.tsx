@@ -1,21 +1,20 @@
-import type { Theme, SxProps } from '@mui/material/styles';
+import type { SxProps, Theme } from '@mui/material/styles';
 
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
 import Autocomplete, { autocompleteClasses } from '@mui/material/Autocomplete';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
 
 import { Iconify } from 'src/components/iconify';
-
-import type { PostItemProps } from './post-item';
+import { MemberItemProps } from './member-item';
 
 // ----------------------------------------------------------------------
 
-type PostSearchProps = {
-  posts: PostItemProps[];
+type MemberSearchProps = {
+  members: MemberItemProps[];
   sx?: SxProps<Theme>;
 };
 
-export function PostSearch({ posts, sx }: PostSearchProps) {
+export function MemberSearch({ members, sx }: MemberSearchProps) {
   return (
     <Autocomplete
       sx={{ width: 280 }}
@@ -32,8 +31,8 @@ export function PostSearch({ posts, sx }: PostSearchProps) {
           },
         },
       }}
-      options={posts}
-      getOptionLabel={(post) => post.title}
+      options={members}
+      getOptionLabel={(member) => member.name}
       isOptionEqualToValue={(option, value) => option.id === value.id}
       renderInput={(params) => (
         <TextField

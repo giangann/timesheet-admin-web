@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { UserView } from 'src/sections/user/view';
+import { TeamOutsideWkTime } from 'src/sections/team-owt/view';
 
 // ----------------------------------------------------------------------
 
@@ -10,10 +10,10 @@ export default function Page() {
   return (
     <>
       <Helmet>
-        <title> {`Nhân viên - ${CONFIG.appName}`}</title>
+        <title> {`Ngoài giờ đơn vị - ${CONFIG.appName}`}</title>
       </Helmet>
 
-      <UserView />
+      <TeamOutsideWkTime />
     </>
   );
 }
