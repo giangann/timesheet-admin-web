@@ -13,8 +13,8 @@ import IconButton from '@mui/material/IconButton';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 
 import { useRouter, usePathname } from 'src/routes/hooks';
-
 import { _myAccount } from 'src/_mock';
+import { useAuth } from 'src/hooks/use-auth';
 
 // ----------------------------------------------------------------------
 
@@ -31,6 +31,8 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
   const router = useRouter();
 
   const pathname = usePathname();
+
+  const { logout } = useAuth();
 
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
@@ -52,8 +54,8 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
   );
 
   const handleLogout = useCallback(() => {
-    router.push('/sign-in');
-  }, [router]);
+    logout();
+  }, [logout]);
 
   return (
     <>

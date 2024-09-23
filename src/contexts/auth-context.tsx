@@ -1,5 +1,7 @@
+import { log } from 'console';
 import React from 'react';
 import { useLocalStorage } from 'src/hooks/use-local-storage';
+import { useRouter } from 'src/routes/hooks';
 import { getApi, postApi } from 'src/services/api';
 import { TCredentials, TUserInfo } from 'src/types/auth';
 
@@ -7,11 +9,13 @@ export const AuthContext = React.createContext<{
   token: string | null;
   user: TUserInfo | null;
   signIn: (credentials: TCredentials) => any;
+  logout: () => any;
   verifyToken: () => any;
 }>({
   token: null,
   user: null,
   signIn(_credentials) {},
+  logout() {},
   verifyToken() {},
 });
 
@@ -21,6 +25,7 @@ type ProviderProps = {
 export function AuthProvider({ children }: ProviderProps) {
   const [tokenValue, setTokenValue] = useLocalStorage<string>('token');
   const [userInfoValue, setUserInfoValue] = useLocalStorage<TUserInfo>('user');
+  const router = useRouter();
 
   // define signIn, logOut, verifyToken
   const signIn = React.useCallback(
@@ -39,6 +44,12 @@ export function AuthProvider({ children }: ProviderProps) {
     },
     [setTokenValue]
   );
+
+  const logout = React.useCallback(() => {
+    setTokenValue(null);
+    setUserInfoValue(null);
+    router.replace('/sign-in');
+  }, [router, setTokenValue, setUserInfoValue]);
 
   const verifyToken = React.useCallback(async () => {
     console.log('tokenValue', tokenValue);
@@ -61,9 +72,10 @@ export function AuthProvider({ children }: ProviderProps) {
       token: tokenValue,
       user: userInfoValue,
       signIn,
+      logout,
       verifyToken,
     }),
-    [tokenValue, userInfoValue, signIn, verifyToken]
+    [tokenValue, userInfoValue, signIn, logout, verifyToken]
   );
 
   return <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>;
