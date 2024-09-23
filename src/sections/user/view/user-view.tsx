@@ -1,28 +1,26 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
-import Button from '@mui/material/Button';
 import TableBody from '@mui/material/TableBody';
-import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
+import Typography from '@mui/material/Typography';
 
 import { _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 
-import { useAuth } from 'src/hooks/use-auth';
-import { useSnackbar } from 'notistack';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 
-import { TableNoData } from '../table-no-data';
-import { UserTableRow } from '../user-table-row';
-import { UserTableHead } from '../user-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
+import { TableNoData } from '../table-no-data';
+import { UserTableHead } from '../user-table-head';
+import { UserTableRow } from '../user-table-row';
 import { UserTableToolbar } from '../user-table-toolbar';
-import { emptyRows, applyFilter, getComparator } from '../utils';
+import { applyFilter, emptyRows, getComparator } from '../utils';
 
 import type { UserProps } from '../user-table-row';
 
@@ -41,23 +39,6 @@ export function UserView() {
 
   const notFound = !dataFiltered.length && !!filterName;
 
-  const { enqueueSnackbar } = useSnackbar();
-  const { verifyToken } = useAuth();
-  const onCheck = async () => {
-    try {
-      const verifyResponse = await verifyToken();
-
-      if (verifyResponse.statusCode === 200) {
-        enqueueSnackbar('ok', { variant: 'success' });
-      } else {
-        enqueueSnackbar(verifyResponse.error, { variant: 'error' });
-      }
-    } catch (error: any) {
-      console.log('error', error);
-      enqueueSnackbar(error.message, { variant: 'error' });
-    }
-  };
-
   return (
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
@@ -68,7 +49,7 @@ export function UserView() {
           variant="contained"
           color="inherit"
           startIcon={<Iconify icon="mingcute:add-line" />}
-          onClick={onCheck}
+          onClick={() => {}}
         >
           Tạo mới
         </Button>
