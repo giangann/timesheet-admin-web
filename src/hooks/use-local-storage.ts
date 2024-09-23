@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-type UseStorageHook<T> = [T | null, (value: T | null) => void];
+type UseStorageHook<T> = [[boolean, T | null], (value: T | null) => void];
 export function useLocalStorage<T>(key: string): UseStorageHook<T> {
   const [item, setItem] = React.useState<T | null>(null);
-
+  const [loading, setLoading] = useState<boolean>(true);
   // get
   React.useEffect(() => {
     const stringfyValue = localStorage.getItem(key);
@@ -12,6 +12,8 @@ export function useLocalStorage<T>(key: string): UseStorageHook<T> {
       const parsedValue: T = JSON.parse(stringfyValue);
       setItem(parsedValue);
     }
+
+    setLoading(false);
   }, [key]);
 
   const setItemValue = React.useCallback(
@@ -30,5 +32,5 @@ export function useLocalStorage<T>(key: string): UseStorageHook<T> {
     [key]
   );
 
-  return [item, setItemValue];
+  return [[loading, item], setItemValue];
 }

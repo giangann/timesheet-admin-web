@@ -1,11 +1,13 @@
 import type { Breakpoint, SxProps, Theme } from '@mui/material/styles';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 
+import { useAuth } from 'src/hooks/use-auth';
+import { useRouter } from 'src/routes/hooks';
 
 import { Iconify } from 'src/components/iconify';
 
@@ -31,11 +33,24 @@ export type DashboardLayoutProps = {
 
 export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) {
   const theme = useTheme();
+  const { verifyToken } = useAuth();
+  const router = useRouter();
 
   const [navOpen, setNavOpen] = useState(false);
 
   const layoutQuery: Breakpoint = 'lg';
 
+  useEffect(() => {
+    async function checkToken() {
+      const responseJson = await verifyToken();
+
+      if (responseJson.statusCode !== 200) {
+        router.replace('/sign-in');
+      }
+    }
+    checkToken();
+
+  }, [router, verifyToken]);
   return (
     <LayoutSection
       /** **************************************

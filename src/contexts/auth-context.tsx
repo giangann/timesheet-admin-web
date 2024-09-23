@@ -1,4 +1,3 @@
-import { log } from 'console';
 import React from 'react';
 import { useLocalStorage } from 'src/hooks/use-local-storage';
 import { useRouter } from 'src/routes/hooks';
@@ -23,16 +22,14 @@ type ProviderProps = {
   children: React.ReactNode;
 };
 export function AuthProvider({ children }: ProviderProps) {
-  const [tokenValue, setTokenValue] = useLocalStorage<string>('token');
-  const [userInfoValue, setUserInfoValue] = useLocalStorage<TUserInfo>('user');
+  const [[loading, tokenValue], setTokenValue] = useLocalStorage<string>('token');
+  const [[_, userInfoValue], setUserInfoValue] = useLocalStorage<TUserInfo>('user');
   const router = useRouter();
 
-  // define signIn, logOut, verifyToken
   const signIn = React.useCallback(
     async (credentials: TCredentials) => {
       const signInRes = await postApi('/auth/login', credentials);
       if (signInRes.statusCode === 200) {
-        // update token
         const token = signInRes?.data?.token;
         if (token) {
           setTokenValue(token);
@@ -52,12 +49,11 @@ export function AuthProvider({ children }: ProviderProps) {
   }, [router, setTokenValue, setUserInfoValue]);
 
   const verifyToken = React.useCallback(async () => {
-    console.log('tokenValue', tokenValue);
+    if (loading) return null; // Ensure token is available before calling
+
     const responseJson = await getApi('/auth/verify-token', { token: tokenValue });
-    console.log('responseJson', responseJson);
     if (responseJson.statusCode === 200) {
       const userInfo: TUserInfo | null = responseJson?.data?.user;
-      console.log('userInfo', userInfo);
       if (userInfo) {
         setUserInfoValue(userInfo);
       } else {
@@ -65,7 +61,7 @@ export function AuthProvider({ children }: ProviderProps) {
       }
     }
     return responseJson;
-  }, [tokenValue, setUserInfoValue]);
+  }, [loading, tokenValue, setUserInfoValue]);
 
   const authValue = React.useMemo(
     () => ({
@@ -77,6 +73,10 @@ export function AuthProvider({ children }: ProviderProps) {
     }),
     [tokenValue, userInfoValue, signIn, logout, verifyToken]
   );
+
+  if (loading) {
+    return <div>Loading...</div>; // Or some loading indicator
+  }
 
   return <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>;
 }
