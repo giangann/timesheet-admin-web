@@ -10,12 +10,14 @@ export const AuthContext = React.createContext<{
   signIn: (credentials: TCredentials) => any;
   logout: () => any;
   verifyToken: () => any;
+  initUserData: () => any;
 }>({
   token: null,
   user: null,
   signIn(_credentials) {},
   logout() {},
   verifyToken() {},
+  initUserData() {},
 });
 
 type ProviderProps = {
@@ -52,16 +54,29 @@ export function AuthProvider({ children }: ProviderProps) {
     if (loading) return null; // Ensure token is available before calling
 
     const responseJson = await getApi('/auth/verify-token', { token: tokenValue });
-    if (responseJson.statusCode === 200) {
-      const userInfo: TUserInfo | null = responseJson?.data?.user;
-      if (userInfo) {
-        setUserInfoValue(userInfo);
-      } else {
-        throw new Error('Bad Response! - Cannot update storage data');
-      }
+    if (responseJson.statusCode !== 200) {
+      throw new Error(responseJson.error);
     }
     return responseJson;
-  }, [loading, tokenValue, setUserInfoValue]);
+  }, [loading, tokenValue]);
+
+  const initUserData = React.useCallback(async () => {
+    try {
+      const responseJson = await verifyToken();
+
+      if (responseJson.statusCode === 200) {
+        const userInfo: TUserInfo | null = responseJson?.data?.user;
+        if (userInfo) {
+          setUserInfoValue(userInfo);
+        } else {
+          throw new Error('Bad Response! - Cannot update storage data');
+        }
+      }
+      return responseJson;
+    } catch (error: any) {
+      throw new Error (error.message);
+    }
+  }, [verifyToken, setUserInfoValue]);
 
   const authValue = React.useMemo(
     () => ({
@@ -70,8 +85,9 @@ export function AuthProvider({ children }: ProviderProps) {
       signIn,
       logout,
       verifyToken,
+      initUserData,
     }),
-    [tokenValue, userInfoValue, signIn, logout, verifyToken]
+    [tokenValue, userInfoValue, signIn, logout, verifyToken, initUserData]
   );
 
   if (loading) {

@@ -1,6 +1,6 @@
 import type { Breakpoint, SxProps, Theme } from '@mui/material/styles';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -8,6 +8,7 @@ import { useTheme } from '@mui/material/styles';
 
 import { useAuth } from 'src/hooks/use-auth';
 import { useRouter } from 'src/routes/hooks';
+import { useSnackbar } from 'notistack';
 
 import { Iconify } from 'src/components/iconify';
 
@@ -33,8 +34,9 @@ export type DashboardLayoutProps = {
 
 export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) {
   const theme = useTheme();
-  const { verifyToken } = useAuth();
+  const { verifyToken, initUserData } = useAuth();
   const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [navOpen, setNavOpen] = useState(false);
 
@@ -42,15 +44,26 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
 
   useEffect(() => {
     async function checkToken() {
-      const responseJson = await verifyToken();
-
-      if (responseJson.statusCode !== 200) {
+      try {
+        await verifyToken();
+      } catch (error: any) {
         router.replace('/sign-in');
       }
     }
     checkToken();
-
+    // only call when is not first render
   }, [router, verifyToken]);
+
+  useEffect(() => {
+    async function onInitUserData() {
+      try {
+        await initUserData();
+      } catch (error: any) {
+        enqueueSnackbar(error.message, { variant: 'error' });
+      }
+    }
+    onInitUserData();
+  }, [initUserData, enqueueSnackbar]);
   return (
     <LayoutSection
       /** **************************************
