@@ -28,6 +28,7 @@ export const useGroupUsers = () => {
         setIsLoading(false);
       }
     }
+
     onFetchUsers();
   }, [get, enqueueSnackbar]);
 

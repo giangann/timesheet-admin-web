@@ -48,12 +48,6 @@ export function UserView() {
           Nhân viên
         </Typography>
 
-        {/*----------------------------- TEST -----------------------------*/}
-        <Typography variant="h4" flexGrow={1}>
-          {JSON.stringify(users)}
-        </Typography>
-        {/*----------------------------- TEST -----------------------------*/}
-
         <Button
           variant="contained"
           color="inherit"

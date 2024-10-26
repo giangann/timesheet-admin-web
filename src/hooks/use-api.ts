@@ -1,27 +1,24 @@
+import { useCallback } from 'react';
+import { getApi, postApi } from '../services/api';
 import { UnknownObj } from 'src/types/common';
-import { getApi, postApi } from 'src/services/api';
 import { useAuth } from './use-auth';
 
 export const useApi = () => {
   const { token } = useAuth();
 
-  const get = async (endpoint: string, params?: UnknownObj) => {
+  const get = useCallback(async (endpoint: string, params?: UnknownObj) => {
     const customHeader = new Headers();
     customHeader.append('Authorization', `Bearer ${token}`);
 
-    const responseJson = await getApi(endpoint, params, customHeader);
+    return getApi(endpoint, params, customHeader);
+  }, [token]);
 
-    return responseJson;
-  };
-
-  const post = async (endpoint: string, body?: UnknownObj) => {
+  const post = useCallback(async (endpoint: string, body?: UnknownObj) => {
     const customHeader = new Headers();
     customHeader.append('Authorization', `Bearer ${token}`);
 
-    const responseJson = await postApi(endpoint, body, customHeader);
-
-    return responseJson;
-  };
+    return postApi(endpoint, body, customHeader);
+  }, [token]);
 
   return { get, post };
 };
