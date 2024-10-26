@@ -62,3 +62,26 @@ export const getFileApi = async (endpoint: string, customHeader?: Headers) => {
 
   return response;
 };
+
+
+export const postFormDataApi = async (endpoint: string, formData: FormData, customHeader?: Headers) => {
+  const reqHeader = new Headers();
+  // reqHeader.append('Content-Type', 'multipart/form-data');
+
+  // Append custom headers if provided
+  if (customHeader) {
+    customHeader.forEach((value, key) => reqHeader.append(key, value));
+  }
+
+  const url = `${baseUrl}${endpoint}`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: reqHeader,
+    body: formData,
+  });
+
+  const responseJson = await response.json();
+
+  return responseJson;
+};

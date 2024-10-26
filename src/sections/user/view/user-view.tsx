@@ -1,3 +1,4 @@
+import TextField from '@mui/material/TextField';
 import { useCallback, useState } from 'react';
 
 import Box from '@mui/material/Box';
@@ -21,9 +22,10 @@ import { UserTableRow } from '../user-table-row';
 import { UserTableToolbar } from '../user-table-toolbar';
 import { applyFilter, emptyRows, getComparator } from '../utils';
 
-import { useGroupUsers } from 'src/hooks/user';
+import { useGroupUsers, useImport } from 'src/hooks/user';
 import type { UserProps } from '../user-table-row';
 import { useDownloadExcelFile } from 'src/hooks/excel';
+import { base64ToUrl } from 'src/utils';
 
 // ----------------------------------------------------------------------
 
@@ -33,6 +35,8 @@ export function UserView() {
   const { isDownloading, file, onDownloadFile, fileUrl } = useDownloadExcelFile({
     url: '/users/download-example',
   });
+  const [importFile, setImportFile] = useState<File>();
+  const { onImportFile, isSubmitting, zipData } = useImport({ file: importFile });
 
   const [filterName, setFilterName] = useState('');
 
@@ -51,16 +55,57 @@ export function UserView() {
           Nhân viên ({users.length})
         </Typography>
 
-        <Button
-          variant="contained"
-          color="inherit"
-          startIcon={<Iconify icon="mingcute:add-line" />}
-          onClick={onDownloadFile}
-        >
-          Tải file mẫu
-        </Button>
-        {isDownloading && <Typography variant="caption">downloading...</Typography>}
-        {fileUrl && <a href={fileUrl} download="report.xlsx">save</a>}
+        <Box>
+          <Button
+            variant="contained"
+            color="inherit"
+            startIcon={<Iconify icon="mingcute:add-line" />}
+            onClick={onDownloadFile}
+          >
+            Tải file mẫu
+          </Button>
+          {isDownloading && <Typography variant="caption">downloading...</Typography>}
+          {fileUrl && (
+            <a href={fileUrl} download="report.xlsx">
+              save
+            </a>
+          )}
+        </Box>
+
+        <Box>
+          <Button
+            variant="contained"
+            color="inherit"
+            startIcon={<Iconify icon="mingcute:add-line" />}
+            onClick={onImportFile}
+            disabled={!importFile || isSubmitting}
+          >
+            Import
+          </Button>
+          <TextField
+            type="file"
+            onChange={(event) => {
+              const target = event.target as HTMLInputElement;
+              if (target.files) {
+                setImportFile(target.files[0]);
+              }
+            }}
+            // fullWidth
+            label="Chọn file"
+            placeholder="Nhập số CCCD"
+            InputLabelProps={{ shrink: true }}
+            inputProps={{
+              accept:
+                '.xls, .xlsx, .csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv',
+            }}
+            sx={{ mb: 3 }}
+          />
+          {zipData && (
+            <a href={base64ToUrl(zipData)} download="import_result.xlsx">
+              save result file
+            </a>
+          )}
+        </Box>
       </Box>
 
       <Card>

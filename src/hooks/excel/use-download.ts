@@ -17,7 +17,9 @@ export const useDownloadExcelFile = ({ url }: Params) => {
     setIsDownloading(true);
     try {
       const response = await getFile(url);
+      console.log('file response', response)
       const responseBlob = await response.blob();
+      console.log('responseBlob:', responseBlob)
       setFile(responseBlob);
       setFileUrl(window.URL.createObjectURL(responseBlob));
     } catch (error: any) {
