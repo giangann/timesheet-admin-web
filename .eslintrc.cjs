@@ -105,5 +105,6 @@ module.exports = {
         'internal-pattern': ['src/**'],
       },
     ],
+    'import/order': 0,
   },
 };
