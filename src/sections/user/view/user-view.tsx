@@ -23,12 +23,16 @@ import { applyFilter, emptyRows, getComparator } from '../utils';
 
 import { useGroupUsers } from 'src/hooks/user';
 import type { UserProps } from '../user-table-row';
+import { useDownloadExcelFile } from 'src/hooks/excel';
 
 // ----------------------------------------------------------------------
 
 export function UserView() {
   const table = useTable();
   const { isLoading, users } = useGroupUsers();
+  const { isDownloading, file, onDownloadFile } = useDownloadExcelFile({
+    url: '/users/download-example',
+  });
 
   const [filterName, setFilterName] = useState('');
 
@@ -51,10 +55,11 @@ export function UserView() {
           variant="contained"
           color="inherit"
           startIcon={<Iconify icon="mingcute:add-line" />}
-          onClick={() => {}}
+          onClick={onDownloadFile}
         >
-          Tạo mới
+          Tải file mẫu
         </Button>
+        {isDownloading && <Typography variant="caption">downloading...</Typography>}
       </Box>
 
       <Card>
@@ -84,7 +89,7 @@ export function UserView() {
                 }
                 headLabel={[
                   { id: 'name', label: 'Họ tên' },
-                  
+
                   { id: 'team', label: 'Phòng ban' },
                   { id: 'hotline', label: 'Liên hệ phòng' },
 
