@@ -7,22 +7,25 @@ type Params = {
 };
 export const useDownloadExcelFile = ({ url }: Params) => {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [file, setFile] = useState();
+  const [file, setFile] = useState<Blob>();
+  const [fileUrl, setFileUrl] = useState<any>();
   const { enqueueSnackbar } = useSnackbar();
 
-  const { get } = useApi();
+  const { getFile } = useApi();
 
   const onDownloadFile = useCallback(async () => {
     setIsDownloading(true);
     try {
-      const response = await get(url);
-      setFile(response);
+      const response = await getFile(url);
+      const responseBlob = await response.blob();
+      setFile(responseBlob);
+      setFileUrl(window.URL.createObjectURL(responseBlob));
     } catch (error: any) {
       enqueueSnackbar(error.message, { variant: 'error' });
     } finally {
       setIsDownloading(false);
     }
-  }, [url, get, enqueueSnackbar]);
+  }, [url, getFile, enqueueSnackbar]);
 
-  return { file, onDownloadFile, isDownloading };
+  return { file, onDownloadFile, isDownloading, fileUrl };
 };

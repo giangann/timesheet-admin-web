@@ -46,3 +46,19 @@ export const postApi = async (endpoint: string, body?: UnknownObj, customHeader?
 
   return responseJson;
 };
+
+export const getFileApi = async (endpoint: string, customHeader?: Headers) => {
+  const reqHeader = new Headers();
+  reqHeader.append('ngrok-skip-browser-warning', '69420');
+
+  // Append custom headers if provided
+  if (customHeader) {
+    customHeader.forEach((value, key) => reqHeader.append(key, value));
+  }
+
+  const url = `${baseUrl}${endpoint}`;
+
+  const response = await fetch(url, { method: 'GET', headers: reqHeader });
+
+  return response;
+};

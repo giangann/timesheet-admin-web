@@ -30,7 +30,7 @@ import { useDownloadExcelFile } from 'src/hooks/excel';
 export function UserView() {
   const table = useTable();
   const { isLoading, users } = useGroupUsers();
-  const { isDownloading, file, onDownloadFile } = useDownloadExcelFile({
+  const { isDownloading, file, onDownloadFile, fileUrl } = useDownloadExcelFile({
     url: '/users/download-example',
   });
 
@@ -60,6 +60,7 @@ export function UserView() {
           Tải file mẫu
         </Button>
         {isDownloading && <Typography variant="caption">downloading...</Typography>}
+        {fileUrl && <a href={fileUrl} download="report.xlsx">save</a>}
       </Box>
 
       <Card>
