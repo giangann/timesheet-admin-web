@@ -23,11 +23,13 @@ import { UserTableToolbar } from '../user-table-toolbar';
 import { applyFilter, emptyRows, getComparator } from '../utils';
 
 import type { UserProps } from '../user-table-row';
+import { useGroupUsers } from 'src/hooks/user';
 
 // ----------------------------------------------------------------------
 
 export function UserView() {
   const table = useTable();
+  const { isLoading, users } = useGroupUsers();
 
   const [filterName, setFilterName] = useState('');
 
@@ -45,6 +47,13 @@ export function UserView() {
         <Typography variant="h4" flexGrow={1}>
           Nhân viên
         </Typography>
+
+        {/*----------------------------- TEST -----------------------------*/}
+        <Typography variant="h4" flexGrow={1}>
+          {JSON.stringify(users)}
+        </Typography>
+        {/*----------------------------- TEST -----------------------------*/}
+
         <Button
           variant="contained"
           color="inherit"
