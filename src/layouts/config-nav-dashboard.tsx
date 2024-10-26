@@ -12,11 +12,11 @@ export const navData = [
     title: 'Nhân viên',
     path: '/',
     icon: icon('ic-user'),
-    info: (
-      <Label color="error" variant="inverted">
-        15
-      </Label>
-    ),
+    // info: (
+    //   <Label color="error" variant="inverted">
+    //     15
+    //   </Label>
+    // ),
   },
   {
     title: 'Ngoài giờ đơn vị',
