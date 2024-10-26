@@ -9,7 +9,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import Typography from '@mui/material/Typography';
 
-import { _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Iconify } from 'src/components/iconify';
@@ -22,8 +21,8 @@ import { UserTableRow } from '../user-table-row';
 import { UserTableToolbar } from '../user-table-toolbar';
 import { applyFilter, emptyRows, getComparator } from '../utils';
 
-import type { UserProps } from '../user-table-row';
 import { useGroupUsers } from 'src/hooks/user';
+import type { UserProps } from '../user-table-row';
 
 // ----------------------------------------------------------------------
 
@@ -34,7 +33,7 @@ export function UserView() {
   const [filterName, setFilterName] = useState('');
 
   const dataFiltered: UserProps[] = applyFilter({
-    inputData: _users,
+    inputData: users,
     comparator: getComparator(table.order, table.orderBy),
     filterName,
   });
@@ -45,7 +44,7 @@ export function UserView() {
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
-          Nhân viên
+          Nhân viên ({users.length})
         </Typography>
 
         <Button
@@ -74,21 +73,26 @@ export function UserView() {
               <UserTableHead
                 order={table.order}
                 orderBy={table.orderBy}
-                rowCount={_users.length}
+                rowCount={users.length}
                 numSelected={table.selected.length}
                 onSort={table.onSort}
                 onSelectAllRows={(checked) =>
                   table.onSelectAllRows(
                     checked,
-                    _users.map((user) => user.id)
+                    users.map((user) => user.identifyCard)
                   )
                 }
                 headLabel={[
-                  { id: 'name', label: 'Name' },
-                  { id: 'company', label: 'Company' },
-                  { id: 'role', label: 'Role' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
-                  { id: 'status', label: 'Status' },
+                  { id: 'name', label: 'Họ tên' },
+                  
+                  { id: 'team', label: 'Phòng ban' },
+                  { id: 'hotline', label: 'Liên hệ phòng' },
+
+                  { id: 'role', label: 'Chức vụ' },
+                  { id: 'phone', label: 'Số điện thoại', align: 'left' },
+                  { id: 'address', label: 'Địa chỉ' },
+                  { id: 'email', label: 'Email' },
+
                   { id: '' },
                 ]}
               />
@@ -100,16 +104,16 @@ export function UserView() {
                   )
                   .map((row) => (
                     <UserTableRow
-                      key={row.id}
+                      key={row.identifyCard}
                       row={row}
-                      selected={table.selected.includes(row.id)}
-                      onSelectRow={() => table.onSelectRow(row.id)}
+                      selected={table.selected.includes(row.identifyCard)}
+                      onSelectRow={() => table.onSelectRow(row.identifyCard)}
                     />
                   ))}
 
                 <TableEmptyRows
                   height={68}
-                  emptyRows={emptyRows(table.page, table.rowsPerPage, _users.length)}
+                  emptyRows={emptyRows(table.page, table.rowsPerPage, users.length)}
                 />
 
                 {notFound && <TableNoData searchQuery={filterName} />}
@@ -121,10 +125,10 @@ export function UserView() {
         <TablePagination
           component="div"
           page={table.page}
-          count={_users.length}
+          count={users.length}
           rowsPerPage={table.rowsPerPage}
           onPageChange={table.onChangePage}
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[5, 15, 25, users.length]}
           onRowsPerPageChange={table.onChangeRowsPerPage}
         />
       </Card>

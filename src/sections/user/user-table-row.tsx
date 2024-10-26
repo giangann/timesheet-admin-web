@@ -12,18 +12,11 @@ import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
 
 import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
+import { TGroupUser } from 'src/types/user';
 
 // ----------------------------------------------------------------------
 
-export type UserProps = {
-  id: string;
-  name: string;
-  role: string;
-  status: string;
-  company: string;
-  avatarUrl: string;
-  isVerified: boolean;
-};
+export type UserProps = TGroupUser;
 
 type UserTableRowProps = {
   row: UserProps;
@@ -51,26 +44,18 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
 
         <TableCell component="th" scope="row">
           <Box gap={2} display="flex" alignItems="center">
-            <Avatar alt={row.name} src={row.avatarUrl} />
+            <Avatar alt={row.name} src="null" />
             {row.name}
           </Box>
         </TableCell>
 
-        <TableCell>{row.company}</TableCell>
+        <TableCell>{row.team.name}</TableCell>
+        <TableCell>{row.team.hotline ?? '-'}</TableCell>
 
-        <TableCell>{row.role}</TableCell>
-
-        <TableCell align="center">
-          {row.isVerified ? (
-            <Iconify width={22} icon="solar:check-circle-bold" sx={{ color: 'success.main' }} />
-          ) : (
-            '-'
-          )}
-        </TableCell>
-
-        <TableCell>
-          <Label color={(row.status === 'banned' && 'error') || 'success'}>{row.status}</Label>
-        </TableCell>
+        <TableCell>{row.roleName}</TableCell>
+        <TableCell>{row.phone ?? '-'}</TableCell>
+        <TableCell>{row.address ?? '-'}</TableCell>
+        <TableCell>{row.email ?? '-'}</TableCell>
 
         <TableCell align="right">
           <IconButton onClick={handleOpenPopover}>
