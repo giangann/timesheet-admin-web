@@ -57,14 +57,14 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
         <TableCell>{row.address ?? '-'}</TableCell>
         <TableCell>{row.email ?? '-'}</TableCell>
 
-        <TableCell align="right">
+        {/* <TableCell align="right">
           <IconButton onClick={handleOpenPopover}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
-        </TableCell>
+        </TableCell> */}
       </TableRow>
 
-      <Popover
+      {/* <Popover
         open={!!openPopover}
         anchorEl={openPopover}
         onClose={handleClosePopover}
@@ -97,7 +97,7 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
             Delete
           </MenuItem>
         </MenuList>
-      </Popover>
+      </Popover> */}
     </>
   );
 }
