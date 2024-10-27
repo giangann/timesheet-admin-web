@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useApi } from '../use-api';
 import { useSnackbar } from 'notistack';
+import { saveDownloadedFileBlobFormat } from 'src/utils';
 
 type Params = {
   url: string;
+  fileName: string;
 };
-export const useDownloadExcelFile = ({ url }: Params) => {
+export const useDownloadExcelFile = ({ url, fileName }: Params) => {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [file, setFile] = useState<Blob>();
-  const [fileUrl, setFileUrl] = useState<any>();
   const { enqueueSnackbar } = useSnackbar();
 
   const { getFile } = useApi();
@@ -17,17 +17,17 @@ export const useDownloadExcelFile = ({ url }: Params) => {
     setIsDownloading(true);
     try {
       const response = await getFile(url);
-      console.log('file response', response)
+      if (response.ok) enqueueSnackbar('Tải về thành công', { variant: 'success' });
+
       const responseBlob = await response.blob();
-      console.log('responseBlob:', responseBlob)
-      setFile(responseBlob);
-      setFileUrl(window.URL.createObjectURL(responseBlob));
+
+      saveDownloadedFileBlobFormat(responseBlob, fileName);
     } catch (error: any) {
       enqueueSnackbar(error.message, { variant: 'error' });
     } finally {
       setIsDownloading(false);
     }
-  }, [url, getFile, enqueueSnackbar]);
+  }, [url, fileName, getFile, enqueueSnackbar]);
 
-  return { file, onDownloadFile, isDownloading, fileUrl };
+  return { onDownloadFile, isDownloading };
 };

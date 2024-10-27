@@ -26,15 +26,20 @@ import { useGroupUsers, useImport } from 'src/hooks/user';
 import type { UserProps } from '../user-table-row';
 import { useDownloadExcelFile } from 'src/hooks/excel';
 import { base64ToUrl } from 'src/utils';
+import { Dialog, DialogContent, DialogContentText, DialogTitle, Grid, Modal } from '@mui/material';
+import { useSnackbar } from 'notistack';
 
 // ----------------------------------------------------------------------
 
 export function UserView() {
   const table = useTable();
+  const { enqueueSnackbar } = useSnackbar();
   const { isLoading, users } = useGroupUsers();
-  const { isDownloading, file, onDownloadFile, fileUrl } = useDownloadExcelFile({
+  const { isDownloading, onDownloadFile } = useDownloadExcelFile({
     url: '/users/download-example',
+    fileName: 'ThêmNhânViên_FileExcelMẫu.xlsx',
   });
+  const [openModal, setOpenModal] = useState(false);
   const [importFile, setImportFile] = useState<File>();
   const { onImportFile, isSubmitting, zipData } = useImport({ file: importFile });
 
@@ -54,58 +59,14 @@ export function UserView() {
         <Typography variant="h4" flexGrow={1}>
           Nhân viên ({users.length})
         </Typography>
-
-        <Box>
-          <Button
-            variant="contained"
-            color="inherit"
-            startIcon={<Iconify icon="mingcute:add-line" />}
-            onClick={onDownloadFile}
-          >
-            Tải file mẫu
-          </Button>
-          {isDownloading && <Typography variant="caption">downloading...</Typography>}
-          {fileUrl && (
-            <a href={fileUrl} download="report.xlsx">
-              save
-            </a>
-          )}
-        </Box>
-
-        <Box>
-          <Button
-            variant="contained"
-            color="inherit"
-            startIcon={<Iconify icon="mingcute:add-line" />}
-            onClick={onImportFile}
-            disabled={!importFile || isSubmitting}
-          >
-            Import
-          </Button>
-          <TextField
-            type="file"
-            onChange={(event) => {
-              const target = event.target as HTMLInputElement;
-              if (target.files) {
-                setImportFile(target.files[0]);
-              }
-            }}
-            // fullWidth
-            label="Chọn file"
-            placeholder="Nhập số CCCD"
-            InputLabelProps={{ shrink: true }}
-            inputProps={{
-              accept:
-                '.xls, .xlsx, .csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv',
-            }}
-            sx={{ mb: 3 }}
-          />
-          {zipData && (
-            <a href={base64ToUrl(zipData)} download="import_result.xlsx">
-              save result file
-            </a>
-          )}
-        </Box>
+        <Button
+          variant="contained"
+          color="inherit"
+          startIcon={<Iconify icon="mingcute:add-line" />}
+          onClick={() => setOpenModal(true)}
+        >
+          Thêm mới
+        </Button>
       </Box>
 
       <Card>
@@ -183,6 +144,84 @@ export function UserView() {
           onRowsPerPageChange={table.onChangeRowsPerPage}
         />
       </Card>
+
+      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+        <Box sx={{ p: 4 }}>
+          <DialogTitle>Nhập bằng file excel</DialogTitle>
+          <Grid container rowGap={3}>
+            <Grid item xs={12}>
+              <DialogContentText sx={{ mb: 1 }}>1. Tải về file excel mẫu:</DialogContentText>
+              <Button
+                variant="contained"
+                color="inherit"
+                startIcon={<Iconify icon="material-symbols:download" />}
+                onClick={onDownloadFile}
+                disabled={isDownloading}
+              >
+                Tải về
+              </Button>
+            </Grid>
+
+            <Grid item xs={12}>
+              <DialogContentText sx={{ mb: 2 }}>
+                2. Tải lên file excel đã điền thông tin Nhân viên:
+              </DialogContentText>
+              <Grid container spacing={1}>
+                <Grid item xs={12} md={12}>
+                  <TextField
+                    type="file"
+                    onChange={(event) => {
+                      const target = event.target as HTMLInputElement;
+                      if (target.files) {
+                        setImportFile(target.files[0]);
+                      }
+                    }}
+                    label="Chọn file excel"
+                    InputLabelProps={{ shrink: true, sx: { fontSize: 20 } }}
+                    inputProps={{
+                      accept:
+                        '.xls, .xlsx, .csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv',
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={12}>
+                  <Button
+                    variant="contained"
+                    color="info"
+                    startIcon={<Iconify icon="line-md:upload-loop" />}
+                    disabled={!importFile}
+                  >
+                    Tải lên
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+              <DialogContentText sx={{ mb: 2 }}>3. Kết quả:</DialogContentText>
+              <Grid container spacing={1}>
+                <Grid item xs={12} md={12}>
+                  <Typography>Tổng số bản ghi gửi lên: {2}</Typography>
+                  <Typography>Số bản ghi nhập thành công: {1}</Typography>
+                  <Typography>Số bản ghi nhập thất bại: {1}</Typography>
+                </Grid>
+
+                <Grid item xs={12} md={12}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<Iconify icon="carbon:result-new" />}
+                    disabled={!zipData}
+                  >
+                    Tải về xem file kết quả
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Box>
+      </Dialog>
     </DashboardContent>
   );
 }
