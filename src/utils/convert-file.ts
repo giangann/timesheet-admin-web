@@ -1,4 +1,4 @@
-export function base64ToUrl(base64Data: string | null | undefined) {
+export function base64ToBlob(base64Data: string | null | undefined): Blob | undefined {
   if (!base64Data) return undefined;
 
   const byteCharacters = atob(base64Data);
@@ -11,7 +11,5 @@ export function base64ToUrl(base64Data: string | null | undefined) {
 
   const blob = new Blob([byteArray]);
 
-  const url = window.URL.createObjectURL(blob);
-
-  return url;
+  return blob;
 }

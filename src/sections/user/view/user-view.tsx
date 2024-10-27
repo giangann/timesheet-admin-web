@@ -22,28 +22,36 @@ import { UserTableRow } from '../user-table-row';
 import { UserTableToolbar } from '../user-table-toolbar';
 import { applyFilter, emptyRows, getComparator } from '../utils';
 
-import { useGroupUsers, useImport } from 'src/hooks/user';
-import type { UserProps } from '../user-table-row';
-import { useDownloadExcelFile } from 'src/hooks/excel';
-import { base64ToUrl } from 'src/utils';
-import { Dialog, DialogContent, DialogContentText, DialogTitle, Grid, Modal } from '@mui/material';
+import { Dialog, DialogContentText, DialogTitle, Grid, IconButton, Tooltip } from '@mui/material';
 import { useSnackbar } from 'notistack';
+import { useDownloadExcelFile } from 'src/hooks/excel';
+import { useGroupUsers, useImport } from 'src/hooks/user';
+import { base64ToBlob, saveDownloadedFileBlobFormat } from 'src/utils';
+import type { UserProps } from '../user-table-row';
 
 // ----------------------------------------------------------------------
 
 export function UserView() {
+  const [openModal, setOpenModal] = useState(false);
+  const [importFile, setImportFile] = useState<File>();
+  const [filterName, setFilterName] = useState('');
+
   const table = useTable();
   const { enqueueSnackbar } = useSnackbar();
   const { isLoading, users } = useGroupUsers();
   const { isDownloading, onDownloadFile } = useDownloadExcelFile({
-    url: '/users/download-example',
+    endpoint: '/users/download-example',
     fileName: 'ThêmNhânViên_FileExcelMẫu.xlsx',
   });
-  const [openModal, setOpenModal] = useState(false);
-  const [importFile, setImportFile] = useState<File>();
-  const { onImportFile, isSubmitting, zipData } = useImport({ file: importFile });
-
-  const [filterName, setFilterName] = useState('');
+  const {
+    onImportFile,
+    isSubmitting,
+    response,
+    onResetState: resetImportResponse,
+  } = useImport({
+    endpoint: '/users/import-user',
+    file: importFile,
+  });
 
   const dataFiltered: UserProps[] = applyFilter({
     inputData: users,
@@ -52,6 +60,34 @@ export function UserView() {
   });
 
   const notFound = !dataFiltered.length && !!filterName;
+
+  const onImportFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const target = event.target as HTMLInputElement;
+      if (target.files) {
+        setImportFile(target.files[0]);
+        resetImportResponse();
+      }
+    },
+    [resetImportResponse]
+  );
+
+  const onSaveImportResultFile = useCallback(() => {
+    const responseFileBlob = base64ToBlob(response?.file);
+
+    if (!responseFileBlob) {
+      enqueueSnackbar('Lỗi không tìm thấy Blob File', { variant: 'error' });
+      return;
+    }
+    saveDownloadedFileBlobFormat(responseFileBlob, 'ThêmNhânViên_FileExcelKếtQuả.xlsx');
+  }, [response, enqueueSnackbar]);
+
+  const resetImportFileRequest = useCallback(() => setImportFile(undefined), []);
+
+  const onResetDialogState = useCallback(() => {
+    resetImportFileRequest();
+    resetImportResponse();
+  }, [resetImportFileRequest, resetImportResponse]);
 
   return (
     <DashboardContent>
@@ -146,8 +182,25 @@ export function UserView() {
       </Card>
 
       <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-        <Box sx={{ p: 4 }}>
-          <DialogTitle>Nhập bằng file excel</DialogTitle>
+        <Box sx={{ p: 4, pb: 8 }}>
+          <Box position="relative">
+            <DialogTitle sx={{ textAlign: 'center' }}>Nhập bằng file excel</DialogTitle>
+            <Box position="absolute" top="15%" left={0}>
+              <Tooltip title="Thực hiện lại">
+                <IconButton onClick={onResetDialogState}>
+                  <Iconify icon="mage:reload" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+
+            <Box position="absolute" top="15%" right={0}>
+              <Tooltip title="Đóng">
+                <IconButton onClick={() => setOpenModal(false)}>
+                  <Iconify icon="material-symbols:close" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
           <Grid container rowGap={3}>
             <Grid item xs={12}>
               <DialogContentText sx={{ mb: 1 }}>1. Tải về file excel mẫu:</DialogContentText>
@@ -170,12 +223,7 @@ export function UserView() {
                 <Grid item xs={12} md={12}>
                   <TextField
                     type="file"
-                    onChange={(event) => {
-                      const target = event.target as HTMLInputElement;
-                      if (target.files) {
-                        setImportFile(target.files[0]);
-                      }
-                    }}
+                    onChange={onImportFileChange}
                     label="Chọn file excel"
                     InputLabelProps={{ shrink: true, sx: { fontSize: 20 } }}
                     inputProps={{
@@ -187,10 +235,11 @@ export function UserView() {
 
                 <Grid item xs={12} md={12}>
                   <Button
+                    onClick={onImportFile}
                     variant="contained"
                     color="info"
                     startIcon={<Iconify icon="line-md:upload-loop" />}
-                    disabled={!importFile}
+                    disabled={!importFile || isSubmitting}
                   >
                     Tải lên
                   </Button>
@@ -202,17 +251,22 @@ export function UserView() {
               <DialogContentText sx={{ mb: 2 }}>3. Kết quả:</DialogContentText>
               <Grid container spacing={1}>
                 <Grid item xs={12} md={12}>
-                  <Typography>Tổng số bản ghi gửi lên: {2}</Typography>
-                  <Typography>Số bản ghi nhập thành công: {1}</Typography>
-                  <Typography>Số bản ghi nhập thất bại: {1}</Typography>
+                  <Typography>Tổng số bản ghi gửi lên: {response?.totalRecord ?? '-'}</Typography>
+                  <Typography>
+                    Số bản ghi nhập thành công: {response?.numSuccessRecord ?? '-'}
+                  </Typography>
+                  <Typography>
+                    Số bản ghi nhập thất bại: {response?.numErrorRecord ?? '-'}
+                  </Typography>
                 </Grid>
 
                 <Grid item xs={12} md={12}>
                   <Button
+                    onClick={onSaveImportResultFile}
                     variant="contained"
                     color="primary"
                     startIcon={<Iconify icon="carbon:result-new" />}
-                    disabled={!zipData}
+                    disabled={!response?.file}
                   >
                     Tải về xem file kết quả
                   </Button>

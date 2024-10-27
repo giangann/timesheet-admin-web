@@ -4,10 +4,10 @@ import { useSnackbar } from 'notistack';
 import { saveDownloadedFileBlobFormat } from 'src/utils';
 
 type Params = {
-  url: string;
+  endpoint: string;
   fileName: string;
 };
-export const useDownloadExcelFile = ({ url, fileName }: Params) => {
+export const useDownloadExcelFile = ({ endpoint, fileName }: Params) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -16,7 +16,7 @@ export const useDownloadExcelFile = ({ url, fileName }: Params) => {
   const onDownloadFile = useCallback(async () => {
     setIsDownloading(true);
     try {
-      const response = await getFile(url);
+      const response = await getFile(endpoint);
       if (response.ok) enqueueSnackbar('Tải về thành công', { variant: 'success' });
 
       const responseBlob = await response.blob();
@@ -27,7 +27,7 @@ export const useDownloadExcelFile = ({ url, fileName }: Params) => {
     } finally {
       setIsDownloading(false);
     }
-  }, [url, fileName, getFile, enqueueSnackbar]);
+  }, [endpoint, fileName, getFile, enqueueSnackbar]);
 
   return { onDownloadFile, isDownloading };
 };
