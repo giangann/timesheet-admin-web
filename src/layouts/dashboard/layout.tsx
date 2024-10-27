@@ -1,14 +1,14 @@
 import type { Breakpoint, SxProps, Theme } from '@mui/material/styles';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 
+import { useSnackbar } from 'notistack';
 import { useAuth } from 'src/hooks/use-auth';
 import { useRouter } from 'src/routes/hooks';
-import { useSnackbar } from 'notistack';
 
 import { Iconify } from 'src/components/iconify';
 
@@ -16,7 +16,6 @@ import { layoutClasses } from '../classes';
 import { AccountPopover } from '../components/account-popover';
 import { MenuButton } from '../components/menu-button';
 import { navData } from '../config-nav-dashboard';
-import { _workspaces } from '../config-nav-workspace';
 import { HeaderSection } from '../core/header-section';
 import { LayoutSection } from '../core/layout-section';
 import { Main } from './main';
@@ -34,13 +33,26 @@ export type DashboardLayoutProps = {
 
 export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) {
   const theme = useTheme();
-  const { verifyToken, initUserData } = useAuth();
+  const { verifyToken, initUserData, user } = useAuth();
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
 
   const [navOpen, setNavOpen] = useState(false);
 
   const layoutQuery: Breakpoint = 'lg';
+
+  const userWorkspace = useMemo(
+    () => [
+      {
+        id: 'team-1',
+        // name: `Phòng ${user?.team?.name}`,
+        name: `Trung tâm Hệ Thống Thông Tin - Cơ Yếu`,
+        logo: `/assets/icons/workspaces/logo-1.webp`,
+        plan: '',
+      },
+    ],
+    []
+  );
 
   useEffect(() => {
     async function checkToken() {
@@ -98,7 +110,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   data={navData}
                   open={navOpen}
                   onClose={() => setNavOpen(false)}
-                  workspaces={_workspaces}
+                  workspaces={userWorkspace}
                 />
               </>
             ),
@@ -111,16 +123,16 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                       href: '/',
                       icon: <Iconify width={22} icon="solar:home-angle-bold-duotone" />,
                     },
-                    {
-                      label: 'Profile',
-                      href: '#',
-                      icon: <Iconify width={22} icon="solar:shield-keyhole-bold-duotone" />,
-                    },
-                    {
-                      label: 'Settings',
-                      href: '#',
-                      icon: <Iconify width={22} icon="solar:settings-bold-duotone" />,
-                    },
+                    // {
+                    //   label: 'Profile',
+                    //   href: '#',
+                    //   icon: <Iconify width={22} icon="solar:shield-keyhole-bold-duotone" />,
+                    // },
+                    // {
+                    //   label: 'Settings',
+                    //   href: '#',
+                    //   icon: <Iconify width={22} icon="solar:settings-bold-duotone" />,
+                    // },
                   ]}
                 />
               </Box>
@@ -132,7 +144,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
        * Sidebar
        *************************************** */
       sidebarSection={
-        <NavDesktop data={navData} layoutQuery={layoutQuery} workspaces={_workspaces} />
+        <NavDesktop data={navData} layoutQuery={layoutQuery} workspaces={userWorkspace} />
       }
       /** **************************************
        * Footer

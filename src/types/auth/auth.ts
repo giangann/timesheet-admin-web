@@ -4,11 +4,17 @@ export type TCredentials = {
 };
 
 export type TUserInfo = {
-  name: string;
-  email: string;
   address: string;
-  phone: string;
+  email: string;
   identifyCard: string;
-  roleName: string;
+  name: string;
+  phone: string;
   roleCode: string;
+  roleName: string;
+  team: {
+    id: number;
+    name: string;
+    code: string | null;
+    hotline: string | null;
+  };
 };
