@@ -24,9 +24,8 @@ export const navData = [
     icon: icon('ic-analytics'),
   },
   {
-    title: 'Ngoài giờ cá nhân',
-    path: '/ngoai-gio-ca-nhan',
+    title: 'Bảng chấm công',
+    path: '/bang-cham-cong',
     icon: icon('ic-cart'),
-    
   },
 ];

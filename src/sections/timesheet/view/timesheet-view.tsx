@@ -12,9 +12,12 @@ import { Iconify } from 'src/components/iconify';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { useDownloadExcelFile } from 'src/hooks/excel';
+import { PostSearch } from '../post-search';
 import { fParamsToQueryString } from 'src/utils';
 
-export function TeamOutsideWkTime() {
+// ----------------------------------------------------------------------
+
+export function TimesheetView() {
   const [time, setTime] = useState<Dayjs>(dayjs());
 
   const params = useMemo(
@@ -26,15 +29,15 @@ export function TeamOutsideWkTime() {
   );
 
   const { onDownloadFile, isDownloading } = useDownloadExcelFile({
-    endpoint: `/users/export-payment-for-user-overtime-working?${fParamsToQueryString(params)}`,
-    fileName: `Ngoài giờ đơn vị T${params.month}/${params.year}.xlsx`,
+    endpoint: `/timekeeping/timesheet${fParamsToQueryString(params)}`,
+    fileName: `Bảng chấm công đơn vị T${params.month}/${params.year}.xlsx`,
   });
 
   return (
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
-        Xuât file excel: Bảng ngoài giờ đơn vị theo tháng
+          Xuât file excel: Bảng chấm công đơn vị theo tháng
         </Typography>
       </Box>
 

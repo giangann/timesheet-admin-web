@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { EmpOwtView } from 'src/sections/emp-owt/view';
+import { TimesheetView } from 'src/sections/timesheet/view';
 
 // ----------------------------------------------------------------------
 
@@ -10,10 +10,10 @@ export default function Page() {
   return (
     <>
       <Helmet>
-        <title> {`Ngoài giờ cá nhân - ${CONFIG.appName}`}</title>
+        <title> {`Bảng chấm công - ${CONFIG.appName}`}</title>
       </Helmet>
 
-      <EmpOwtView />
+      <TimesheetView />
     </>
   );
 }
