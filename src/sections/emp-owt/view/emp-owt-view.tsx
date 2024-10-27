@@ -13,7 +13,7 @@ import { PostSearch } from '../post-search';
 
 // ----------------------------------------------------------------------
 
-export function BlogView() {
+export function EmpOwtView() {
   const [sortBy, setSortBy] = useState('latest');
 
   const handleSort = useCallback((newSort: string) => {
@@ -37,6 +37,7 @@ export function BlogView() {
 
       <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 5 }}>
         <PostSearch posts={_posts} />
+        
       </Box>
 
     </DashboardContent>
