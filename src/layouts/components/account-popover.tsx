@@ -96,6 +96,10 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
             {user?.roleName}
           </Typography>
+
+          <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+            Phòng: {user?.team.name}
+          </Typography>
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
