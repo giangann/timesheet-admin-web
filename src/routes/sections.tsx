@@ -12,6 +12,7 @@ import { DashboardLayout } from 'src/layouts/dashboard';
 
 export const UserPage = lazy(() => import('src/pages/user'));
 export const TeamOutsideWorkingTimePage = lazy(() => import('src/pages/team-owt'));
+export const EmployeeOutsideWorkingTimePage = lazy(() => import('src/pages/emp-owt'));
 
 export const TimesheetPage = lazy(() => import('src/pages/timesheet'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
@@ -45,6 +46,7 @@ export function Router() {
       children: [
         { element: <UserPage />, index: true },
         { path: 'ngoai-gio-don-vi', element: <TeamOutsideWorkingTimePage /> },
+        { path: 'ngoai-gio-ca-nhan', element: <EmployeeOutsideWorkingTimePage /> },
         { path: 'bang-cham-cong', element: <TimesheetPage /> },
       ],
     },

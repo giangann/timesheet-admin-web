@@ -19,6 +19,11 @@ export const navData = [
     // ),
   },
   {
+    title: 'Ngoài giờ cá nhân',
+    path: '/ngoai-gio-ca-nhan',
+    icon: icon('ic-lock'),
+  },
+  {
     title: 'Ngoài giờ đơn vị',
     path: '/ngoai-gio-don-vi',
     icon: icon('ic-analytics'),
