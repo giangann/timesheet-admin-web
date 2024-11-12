@@ -1,16 +1,24 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
-import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
-import Popover from '@mui/material/Popover';
-import TableRow from '@mui/material/TableRow';
+import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
-import MenuList from '@mui/material/MenuList';
-import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import MenuItem, { menuItemClasses } from '@mui/material/MenuItem';
+import MenuList from '@mui/material/MenuList';
+import Popover from '@mui/material/Popover';
+import TableCell from '@mui/material/TableCell';
+import TableRow from '@mui/material/TableRow';
 
-import { Label } from 'src/components/label';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+  Tooltip,
+} from '@mui/material';
 import { Iconify } from 'src/components/iconify';
 import { TGroupUser } from 'src/types/user';
 
@@ -22,10 +30,12 @@ type UserTableRowProps = {
   row: UserProps;
   selected: boolean;
   onSelectRow: () => void;
+  onDeleteUser: (row: UserProps) => void;
 };
 
-export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) {
+export function UserTableRow({ row, selected, onSelectRow, onDeleteUser }: UserTableRowProps) {
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
+  const [openCfModal, setOpenCfModal] = useState(false);
 
   const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     setOpenPopover(event.currentTarget);
@@ -35,6 +45,23 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
     setOpenPopover(null);
   }, []);
 
+  const handleOpenConfirmModal = useCallback(() => {
+    setOpenCfModal(true);
+  }, [setOpenCfModal]);
+
+  const handleCloseConfirmModal = useCallback(() => {
+    setOpenCfModal(false);
+  }, [setOpenCfModal]);
+
+  const handleClickDeleteMenuItem = useCallback(() => {
+    handleClosePopover();
+    handleOpenConfirmModal();
+  }, [handleClosePopover, handleOpenConfirmModal]);
+
+  const handleAcceptDelete = useCallback(() => {
+    handleCloseConfirmModal();
+    onDeleteUser(row);
+  }, [handleCloseConfirmModal, onDeleteUser, row]);
   return (
     <>
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
@@ -57,14 +84,14 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
         <TableCell>{row.address ?? '-'}</TableCell>
         <TableCell>{row.email ?? '-'}</TableCell>
 
-        {/* <TableCell align="right">
+        <TableCell align="right">
           <IconButton onClick={handleOpenPopover}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
-        </TableCell> */}
+        </TableCell>
       </TableRow>
 
-      {/* <Popover
+      <Popover
         open={!!openPopover}
         anchorEl={openPopover}
         onClose={handleClosePopover}
@@ -92,12 +119,51 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
             Edit
           </MenuItem>
 
-          <MenuItem onClick={handleClosePopover} sx={{ color: 'error.main' }}>
+          <MenuItem onClick={handleClickDeleteMenuItem} sx={{ color: 'error.main' }}>
             <Iconify icon="solar:trash-bin-trash-bold" />
             Delete
           </MenuItem>
         </MenuList>
-      </Popover> */}
+      </Popover>
+
+      <Dialog open={openCfModal} onClose={handleCloseConfirmModal}>
+        <Box sx={{ p: 4, pb: 4 }}>
+          <Box position="relative">
+            <DialogTitle sx={{ textAlign: 'left' }}>Xác nhận xóa?</DialogTitle>
+
+            <Box position="absolute" top="15%" right={0}>
+              <Tooltip title="Đóng">
+                <IconButton onClick={handleCloseConfirmModal}>
+                  <Iconify icon="material-symbols:close" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+          <Grid container rowGap={3}>
+            <Grid item xs={12}>
+              <DialogContentText sx={{ mb: 1 }}>Xác nhận xóa {row.name}:</DialogContentText>
+            </Grid>
+          </Grid>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              color="inherit"
+              startIcon={<Iconify icon="codicon:discard" />}
+              onClick={handleCloseConfirmModal}
+            >
+              Hủy
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<Iconify icon="material-symbols:delete" />}
+              onClick={handleAcceptDelete}
+            >
+              Xóa
+            </Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
     </>
   );
 }

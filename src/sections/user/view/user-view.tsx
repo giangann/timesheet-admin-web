@@ -25,9 +25,10 @@ import { applyFilter, emptyRows, getComparator } from '../utils';
 import { Dialog, DialogContentText, DialogTitle, Grid, IconButton, Tooltip } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useDownloadExcelFile } from 'src/hooks/excel';
-import { useGroupUsers, useImport } from 'src/hooks/user';
+import { useDeleteUser, useGroupUsers, useImport } from 'src/hooks/user';
 import { base64ToBlob, saveDownloadedFileBlobFormat } from 'src/utils';
 import type { UserProps } from '../user-table-row';
+import { TGroupUser } from 'src/types/user';
 
 // ----------------------------------------------------------------------
 
@@ -38,7 +39,8 @@ export function UserView() {
 
   const table = useTable();
   const { enqueueSnackbar } = useSnackbar();
-  const { isLoading, users } = useGroupUsers();
+  const { isLoading, users, refetchUsers } = useGroupUsers();
+  const { deleteUserById } = useDeleteUser();
   const { isDownloading, onDownloadFile } = useDownloadExcelFile({
     endpoint: '/users/download-example',
     fileName: 'ThêmNhânViên_FileExcelMẫu.xlsx',
@@ -72,6 +74,11 @@ export function UserView() {
     [resetImportResponse]
   );
 
+  const onImportFileAndRefetchData = useCallback(async () => {
+    await onImportFile();
+    refetchUsers();
+  }, [onImportFile, refetchUsers]);
+
   const onSaveImportResultFile = useCallback(() => {
     const responseFileBlob = base64ToBlob(response?.file);
 
@@ -88,6 +95,14 @@ export function UserView() {
     resetImportFileRequest();
     resetImportResponse();
   }, [resetImportFileRequest, resetImportResponse]);
+
+  const onSoftDeleteUser = useCallback(
+    async (user: TGroupUser) => {
+      await deleteUserById(user.id);
+      refetchUsers();
+    },
+    [deleteUserById, refetchUsers]
+  );
 
   return (
     <DashboardContent>
@@ -156,6 +171,7 @@ export function UserView() {
                       row={row}
                       selected={table.selected.includes(row.identifyCard)}
                       onSelectRow={() => table.onSelectRow(row.identifyCard)}
+                      onDeleteUser={onSoftDeleteUser}
                     />
                   ))}
 
@@ -235,7 +251,7 @@ export function UserView() {
 
                 <Grid item xs={12} md={12}>
                   <Button
-                    onClick={onImportFile}
+                    onClick={onImportFileAndRefetchData}
                     variant="contained"
                     color="info"
                     startIcon={<Iconify icon="line-md:upload-loop" />}
