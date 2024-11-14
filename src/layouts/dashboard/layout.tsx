@@ -59,7 +59,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
       try {
         await verifyToken();
       } catch (error: any) {
-        router.replace('/sign-in');
+        // router.replace('/sign-in');
       }
     }
     checkToken();

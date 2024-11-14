@@ -11,6 +11,7 @@ import { DashboardLayout } from 'src/layouts/dashboard';
 // ----------------------------------------------------------------------
 
 export const UserPage = lazy(() => import('src/pages/user'));
+export const UserDetailPage = lazy(() => import('src/pages/user-detail'));
 export const TeamOutsideWorkingTimePage = lazy(() => import('src/pages/team-owt'));
 export const EmployeeOutsideWorkingTimePage = lazy(() => import('src/pages/emp-owt'));
 
@@ -48,6 +49,8 @@ export function Router() {
         { path: 'ngoai-gio-don-vi', element: <TeamOutsideWorkingTimePage /> },
         { path: 'ngoai-gio-ca-nhan', element: <EmployeeOutsideWorkingTimePage /> },
         { path: 'bang-cham-cong', element: <TimesheetPage /> },
+        { path: 'nhan-vien/:id', element: <UserDetailPage /> },
+
       ],
     },
     {
