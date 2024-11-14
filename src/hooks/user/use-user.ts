@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useApi } from '../use-api';
 import { useSnackbar } from 'notistack';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { _userDetail } from 'src/_mock';
 import { DEFAULT_PAGI_PARAMS } from 'src/configs';
 import { TGroupUser } from 'src/types/user';
+import { arrayObjectToMap } from 'src/utils';
+import { useApi } from '../use-api';
 
 export const useGroupUsers = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -35,6 +37,15 @@ export const useGroupUsers = () => {
   return { users, isLoading, refetchUsers: onFetchUsers };
 };
 
+export const useGetUserDetailFromUserList = (userId: number) => {
+  const { isLoading, users, refetchUsers } = useGroupUsers();
+
+  const userMap: Map<string, TGroupUser> = useMemo(() => arrayObjectToMap(users, 'id'), [users]);
+  const userDetail = useMemo(() => userMap.get(userId.toString()), [userMap, userId]);
+
+  return { isLoading, userDetail, onFetchUserDetail: refetchUsers };
+};
+
 export const useUserDetail = (userId: number) => {
   const [isLoading, setIsLoading] = useState(false);
   const [userDetail, setUserDetail] = useState<TGroupUser>();
@@ -45,9 +56,10 @@ export const useUserDetail = (userId: number) => {
   const onFetchUserDetail = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await get(`/users/${userId}`);
+      const response = await get(`/users`, { id: userId });
       if (response.statusCode === 200) {
-        setUserDetail(response.data.user);
+        // setUserDetail(response.data.user); // uncomment this when api ok
+        setUserDetail(_userDetail); // comment this when api ok
       } else {
         enqueueSnackbar(response.error ?? response.message ?? 'Unknown error', {
           variant: 'error',
@@ -76,7 +88,7 @@ export const useUserUpdate = () => {
     async (userId: number, newValues: Partial<TGroupUser>) => {
       setIsSubmitting(true);
       try {
-        const response = await put(`/users/${userId}`, newValues);
+        const response = await put(`/users`, { id: userId }, newValues);
         if (response.statusCode === 200) {
           enqueueSnackbar('Cập nhật thành công', { variant: 'success' });
         } else {

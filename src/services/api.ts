@@ -47,7 +47,7 @@ export const postApi = async (endpoint: string, body?: UnknownObj, customHeader?
   return responseJson;
 };
 
-export const putApi = async (endpoint: string, body?: UnknownObj, customHeader?: Headers) => {
+export const putApi = async (endpoint: string, params?:UnknownObj, body?: UnknownObj, customHeader?: Headers) => {
   const reqHeader = new Headers();
   reqHeader.append('Content-Type', 'application/json');
 
@@ -56,7 +56,8 @@ export const putApi = async (endpoint: string, body?: UnknownObj, customHeader?:
     customHeader.forEach((value, key) => reqHeader.append(key, value));
   }
 
-  const url = `${baseUrl}${endpoint}`;
+  const queryString = fParamsToQueryString(params);
+  const url = `${baseUrl}${endpoint}${queryString}`;
 
   const response = await fetch(url, {
     method: 'PUT',

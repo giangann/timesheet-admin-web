@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { deleteApi, getApi, getFileApi, postApi, postFormDataApi } from '../services/api';
+import { deleteApi, getApi, getFileApi, postApi, postFormDataApi, putApi } from '../services/api';
 import { UnknownObj } from 'src/types/common';
 import { useAuth } from './use-auth';
 
@@ -27,11 +27,11 @@ export const useApi = () => {
   );
 
   const put = useCallback(
-    async (endpoint: string, body?: UnknownObj) => {
+    async (endpoint: string, params?: UnknownObj, body?: UnknownObj) => {
       const customHeader = new Headers();
       customHeader.append('Authorization', `Bearer ${token}`);
 
-      return postApi(endpoint, body, customHeader);
+      return putApi(endpoint, params, body, customHeader);
     },
     [token]
   );
