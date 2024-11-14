@@ -31,9 +31,16 @@ type UserTableRowProps = {
   selected: boolean;
   onSelectRow: () => void;
   onDeleteUser: (row: UserProps) => void;
+  onGotoDetail: (row: UserProps) => void;
 };
 
-export function UserTableRow({ row, selected, onSelectRow, onDeleteUser }: UserTableRowProps) {
+export function UserTableRow({
+  row,
+  selected,
+  onSelectRow,
+  onDeleteUser,
+  onGotoDetail,
+}: UserTableRowProps) {
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
   const [openCfModal, setOpenCfModal] = useState(false);
 
@@ -57,6 +64,11 @@ export function UserTableRow({ row, selected, onSelectRow, onDeleteUser }: UserT
     handleClosePopover();
     handleOpenConfirmModal();
   }, [handleClosePopover, handleOpenConfirmModal]);
+
+  const handleClickEditMenuItem = useCallback(() => {
+    handleClosePopover();
+    onGotoDetail(row);
+  }, [handleClosePopover, onGotoDetail, row]);
 
   const handleAcceptDelete = useCallback(() => {
     handleCloseConfirmModal();
@@ -114,7 +126,7 @@ export function UserTableRow({ row, selected, onSelectRow, onDeleteUser }: UserT
             },
           }}
         >
-          <MenuItem onClick={handleClosePopover}>
+          <MenuItem onClick={handleClickEditMenuItem}>
             <Iconify icon="solar:pen-bold" />
             Edit
           </MenuItem>

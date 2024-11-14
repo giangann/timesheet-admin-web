@@ -29,6 +29,7 @@ import { useDeleteUser, useGroupUsers, useImport } from 'src/hooks/user';
 import { base64ToBlob, saveDownloadedFileBlobFormat } from 'src/utils';
 import type { UserProps } from '../user-table-row';
 import { TGroupUser } from 'src/types/user';
+import { useRouter } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
 
@@ -37,6 +38,7 @@ export function UserView() {
   const [importFile, setImportFile] = useState<File>();
   const [filterName, setFilterName] = useState('');
 
+  const router = useRouter();
   const table = useTable();
   const { enqueueSnackbar } = useSnackbar();
   const { isLoading, users, refetchUsers } = useGroupUsers();
@@ -95,6 +97,13 @@ export function UserView() {
     resetImportFileRequest();
     resetImportResponse();
   }, [resetImportFileRequest, resetImportResponse]);
+
+  const onGotoUserDetailPage = useCallback(
+    (user: TGroupUser) => {
+      router.push(`/nhan-vien/${user.id}`);
+    },
+    [router]
+  );
 
   const onSoftDeleteUser = useCallback(
     async (user: TGroupUser) => {
@@ -172,6 +181,7 @@ export function UserView() {
                       selected={table.selected.includes(row.identifyCard)}
                       onSelectRow={() => table.onSelectRow(row.identifyCard)}
                       onDeleteUser={onSoftDeleteUser}
+                      onGotoDetail={onGotoUserDetailPage}
                     />
                   ))}
 

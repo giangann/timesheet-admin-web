@@ -26,6 +26,16 @@ export const useApi = () => {
     [token]
   );
 
+  const put = useCallback(
+    async (endpoint: string, body?: UnknownObj) => {
+      const customHeader = new Headers();
+      customHeader.append('Authorization', `Bearer ${token}`);
+
+      return postApi(endpoint, body, customHeader);
+    },
+    [token]
+  );
+
   const remove = useCallback(
     async (endpoint: string, params?: UnknownObj) => {
       const customHeader = new Headers();
@@ -55,5 +65,5 @@ export const useApi = () => {
     },
     [token]
   );
-  return { get, post, remove, getFile, postFormData };
+  return { get, post, put, remove, getFile, postFormData };
 };
