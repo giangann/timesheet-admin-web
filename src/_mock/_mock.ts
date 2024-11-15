@@ -1,5 +1,3 @@
-import { TGroupUser } from 'src/types/user';
-
 export const _id = (index: number) => `e99f09a7-dd88-49d5-b1c8-1daf80c2d7b${index}`;
 
 export const _times = (index: number) =>
@@ -232,24 +230,3 @@ export const _productNames = (index: number) =>
     'Nike React Art3mis',
     'Nike React Infinity Run Flyknit A.I.R. Chaz Bear',
   ][index];
-
-export const _bearerToken =
-  'eyJhbGciOiJIUzI1NiJ9.eyJhZGRyZXNzIjoiTm8gYWRkIiwicm9sZSI6IlbEg24gdGjGsCIsInBob25lIjoiMDAwMDAwMDAwMDAiLCJuYW1lIjoiZGF4dXRpIiwiZW1haWwiOiJkYXh1dGlAZ21haWwuY29tIiwic3ViIjoiMDEyMzQ1Njc4OSIsImlhdCI6MTcyNjQ2NDQxOCwiZXhwIjoxNzI2NTUwODE4fQ.UPSxA8nIV8KLE57sfpYRwwmrR6AFa4REbah5l4SqT0g';
-
-
-export const _userDetail: TGroupUser = {
-  id: 258,
-  name: 'Nguyễn Quang Ngân',
-  email: null,
-  address: null,
-  phone: null,
-  identifyCard: '033083007498',
-  roleName: 'Chuyên viên',
-  roleCode: 'SPECIALIST',
-  team: {
-    id: 155,
-    name: 'Tổng hợp',
-    code: null,
-    hotline: null,
-  },
-};

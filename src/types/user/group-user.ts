@@ -14,3 +14,7 @@ export type TGroupUser = {
     hotline: string | null;
   };
 };
+
+export type TGroupUserUpdate = Partial<
+  TGroupUser & { role: string; roleId: number; teamName: string; teamId: string }
+>;

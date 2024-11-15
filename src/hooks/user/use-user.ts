@@ -1,6 +1,5 @@
 import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { _userDetail } from 'src/_mock';
 import { DEFAULT_PAGI_PARAMS } from 'src/configs';
 import { TGroupUser } from 'src/types/user';
 import { arrayObjectToMap } from 'src/utils';
@@ -59,7 +58,6 @@ export const useUserDetail = (userId: number) => {
       const response = await get(`/users`, { id: userId });
       if (response.statusCode === 200) {
         // setUserDetail(response.data.user); // uncomment this when api ok
-        setUserDetail(_userDetail); // comment this when api ok
       } else {
         enqueueSnackbar(response.error ?? response.message ?? 'Unknown error', {
           variant: 'error',
