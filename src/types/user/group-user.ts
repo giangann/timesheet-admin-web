@@ -16,5 +16,5 @@ export type TGroupUser = {
 };
 
 export type TGroupUserUpdate = Partial<
-  TGroupUser & { role: string; roleId: number; teamName: string; teamId: string }
+  TGroupUser & { role: string; roleId: number; teamName: string; teamId: string, password:string }
 >;

@@ -9,7 +9,7 @@ import {
   Select,
   Skeleton,
   TextField,
-  Typography
+  Typography,
 } from '@mui/material';
 import { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
@@ -28,9 +28,7 @@ export function UserDetailView() {
   const params = useParams();
   const userId = useMemo(() => parseInt(params?.id ?? '0', 10), [params]);
 
-  const { handleSubmit, register, formState, reset } = useForm<Partial<TGroupUserUpdate>>({
-    defaultValues: { teamId: '1' },
-  });
+  const { handleSubmit, register, formState, reset } = useForm<Partial<TGroupUserUpdate>>();
   const { onUpdateUser } = useUserUpdate();
 
   const { isLoading, userDetail, onFetchUserDetail } = useGetUserDetailFromUserList(userId);
@@ -144,24 +142,46 @@ export function UserDetailView() {
                   {isRolesLoading && <Skeleton variant="rounded" height={56} width="100%" />}
                   {!isRolesLoading && (
                     <FormControl fullWidth>
-                    <InputLabel id="role-code-label">Chức vụ</InputLabel>
-                    <Select
-                      {...register('roleCode')}
-                      label="Chức vụ"
-                      labelId="role-code-label"
-                      id="role-code"
-                      fullWidth
-                      defaultValue={userDetail.roleCode}
-                      sx={{ mb: 3 }}
-                    >
-                      {roleOpts.map((opt) => (
-                        <MenuItem value={opt.value} key={opt.value}>
-                          {opt.text}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                      <InputLabel id="role-code-label">Chức vụ</InputLabel>
+                      <Select
+                        {...register('roleCode')}
+                        label="Chức vụ"
+                        labelId="role-code-label"
+                        id="role-code"
+                        fullWidth
+                        defaultValue={userDetail.roleCode}
+                        sx={{ mb: 3 }}
+                      >
+                        {roleOpts.map((opt) => (
+                          <MenuItem value={opt.value} key={opt.value}>
+                            {opt.text}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                   )}
+                </Grid>
+
+                <Grid item xs={12} md={4} xl={3}>
+                  <TextField
+                    {...register('identifyCard')}
+                    defaultValue={userDetail.identifyCard}
+                    label="Số CCCD"
+                    placeholder="Nhập số CCCD"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ mb: 3 }}
+                  />
+                </Grid>
+                <Grid item xs={12} md={4} xl={3}>
+                  <TextField
+                    {...register('password')}
+                    label="Mật khẩu"
+                    placeholder="Nhập mật khẩu mới"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ mb: 3 }}
+                  />
                 </Grid>
               </Grid>
 
