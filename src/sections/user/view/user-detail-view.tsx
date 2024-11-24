@@ -18,7 +18,7 @@ import { useGroupRoles } from 'src/hooks/role';
 import { useGroupTeams } from 'src/hooks/team';
 import { useGetUserDetailFromUserList, useUserUpdate } from 'src/hooks/user';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { TGroupUser, TGroupUserUpdate } from 'src/types/user';
+import { TGroupUser, TGroupUserUpdate, TGroupUserUpdateFormFields } from 'src/types/user';
 import { dataToOptions } from 'src/utils/array-util';
 import { dirtyValues } from 'src/utils/format-field-values';
 
@@ -28,7 +28,7 @@ export function UserDetailView() {
   const params = useParams();
   const userId = useMemo(() => parseInt(params?.id ?? '0', 10), [params]);
 
-  const { handleSubmit, register, formState, reset } = useForm<Partial<TGroupUserUpdate>>();
+  const { handleSubmit, register, formState, reset } = useForm<TGroupUserUpdateFormFields>();
   const { onUpdateUser } = useUserUpdate();
 
   const { isLoading, userDetail, onFetchUserDetail } = useGetUserDetailFromUserList(userId);
@@ -36,15 +36,20 @@ export function UserDetailView() {
   const { isLoading: isRolesLoading, roles } = useGroupRoles();
 
   const teamOpts = useMemo(() => dataToOptions(teams, 'name', 'id'), [teams]);
-  const roleOpts = useMemo(() => dataToOptions(roles, 'name', 'code'), [roles]);
-
+  const roleOpts = useMemo(() => dataToOptions(roles, 'name', 'id'), [roles]);
+  console.log({ roleOpts });
   const onSave = useCallback(
-    async (values: Partial<TGroupUser>) => {
+    async (values: TGroupUserUpdateFormFields) => {
       // get dirty values
-      const data = dirtyValues(formState.dirtyFields, values);
+      const data: Partial<TGroupUserUpdateFormFields> = dirtyValues(formState.dirtyFields, values);
+
+      // process data
+      const processedData: TGroupUserUpdate = {
+        ...data,
+      };
 
       // call on
-      await onUpdateUser(userId, data);
+      await onUpdateUser(userId, processedData);
 
       // side effect
       onFetchUserDetail();
@@ -120,7 +125,7 @@ export function UserDetailView() {
                     <FormControl fullWidth>
                       <InputLabel id="team-id-label">Phòng ban</InputLabel>
                       <Select
-                        {...register('teamId')}
+                        {...register('team')}
                         label="Phòng ban"
                         labelId="team-id-label"
                         id="team-id"
@@ -144,12 +149,16 @@ export function UserDetailView() {
                     <FormControl fullWidth>
                       <InputLabel id="role-code-label">Chức vụ</InputLabel>
                       <Select
-                        {...register('roleCode')}
+                        {...register('role')}
                         label="Chức vụ"
                         labelId="role-code-label"
                         id="role-code"
                         fullWidth
-                        defaultValue={userDetail.roleCode}
+                        defaultValue={
+                          roles
+                            .filter((role) => role.code === userDetail.roleCode)?.[0]
+                            ?.id?.toString() ?? 'null'
+                        }
                         sx={{ mb: 3 }}
                       >
                         {roleOpts.map((opt) => (

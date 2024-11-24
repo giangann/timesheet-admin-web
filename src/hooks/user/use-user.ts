@@ -1,7 +1,7 @@
 import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DEFAULT_PAGI_PARAMS } from 'src/configs';
-import { TGroupUser } from 'src/types/user';
+import { TGroupUser, TGroupUserUpdate } from 'src/types/user';
 import { arrayObjectToMap } from 'src/utils';
 import { useApi } from '../use-api';
 
@@ -83,7 +83,7 @@ export const useUserUpdate = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const onUpdateUser = useCallback(
-    async (userId: number, newValues: Partial<TGroupUser>) => {
+    async (userId: number, newValues: TGroupUserUpdate) => {
       setIsSubmitting(true);
       try {
         const response = await put(`/users`, { id: userId }, newValues);

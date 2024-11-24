@@ -15,6 +15,15 @@ export type TGroupUser = {
   };
 };
 
-export type TGroupUserUpdate = Partial<
-  TGroupUser & { role: string; roleId: number; teamName: string; teamId: string, password:string }
->;
+export type TGroupUserUpdateFormFields = {
+  name: string | undefined;
+  email: string | undefined;
+  address: string | undefined;
+  phone: string | undefined;
+  team: number | undefined;
+  role: number | undefined;
+  identifyCard: string | undefined;
+  password: string | undefined;
+};
+
+export type TGroupUserUpdate = Partial<TGroupUserUpdateFormFields>;
