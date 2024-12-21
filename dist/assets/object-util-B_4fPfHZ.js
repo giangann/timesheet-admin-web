@@ -1,0 +1,1 @@
+function u(n,t){const r={};for(const e in n)t.includes(e)&&(r[e]=n[e]);return r}function i(n){return Object.values(n).some(t=>t==null)}function s(n){return Object.values(n).some(t=>t==="")}function c(n){return i(n)||s(n)}export{c as h,u as p};
