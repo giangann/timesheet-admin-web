@@ -2,6 +2,7 @@ import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useState } from 'react';
 import { TGroupUser } from 'src/types/user';
 import { useApi } from '../use-api';
+import { TTeamCreate } from 'src/types/team';
 
 export const useGroupTeams = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -34,3 +35,62 @@ export const useGroupTeams = () => {
   return { teams, isLoading, onFetchTeams };
 };
 
+// write what?
+// hook for create, update, delete team?
+export const useCreateTeam = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const { post } = useApi();
+
+  const onCreateNewTeam = useCallback(
+    async (data: TTeamCreate) => {
+      setIsLoading(true);
+      try {
+        const response = await post('/teams', data);
+        if (response.statusCode === 200) {
+          enqueueSnackbar('Tạo mới thành công', { variant: 'success' });
+        } else {
+          enqueueSnackbar(response.error ?? response.message ?? 'Unknown error', {
+            variant: 'error',
+          });
+        }
+      } catch (error: any) {
+        enqueueSnackbar(error.message ?? 'Unknown error', { variant: 'error' });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [enqueueSnackbar, setIsLoading, post]
+  );
+
+  return { isLoading, onCreateNewTeam };
+};
+
+export const useDeleteTeam = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const { remove } = useApi();
+
+  const onDeleteTeam = useCallback(
+    async (id: number) => {
+      setIsLoading(true);
+      try {
+        const response = await remove('/teams', { id });
+        if (response.statusCode === 200) {
+          enqueueSnackbar('Xóa thành công', { variant: 'success' });
+        } else {
+          enqueueSnackbar(response.error ?? response.message ?? 'Unknown error', {
+            variant: 'error',
+          });
+        }
+      } catch (error: any) {
+        enqueueSnackbar(error.message ?? 'Unknown error', { variant: 'error' });
+      } finally { 
+        setIsLoading(false);
+      }
+    },
+    [remove, enqueueSnackbar, setIsLoading]
+  );
+
+  return { onDeleteTeam, isLoading };
+};

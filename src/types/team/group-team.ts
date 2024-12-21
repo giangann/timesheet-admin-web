@@ -4,3 +4,7 @@ export type TGroupTeam = {
   code: string | null;
   hotline: string | null;
 };
+
+export type TTeamCreate = {
+  name: string;
+};
