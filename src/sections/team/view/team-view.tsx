@@ -1,10 +1,366 @@
-import { Box, Typography } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import { useCallback, useState } from 'react';
+
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableContainer from '@mui/material/TableContainer';
+import TablePagination from '@mui/material/TablePagination';
+import Typography from '@mui/material/Typography';
+
 import { DashboardContent } from 'src/layouts/dashboard';
 
+import { Iconify } from 'src/components/iconify';
+import { Scrollbar } from 'src/components/scrollbar';
+
+import { TableEmptyRows } from '../table-empty-rows';
+import { TableNoData } from '../table-no-data';
+import { UserTableHead } from '../team-table-head';
+import { UserTableRow } from '../team-table-row';
+import { UserTableToolbar } from '../team-table-toolbar';
+import { applyFilter, emptyRows, getComparator } from '../utils';
+
+import { Dialog, DialogContentText, DialogTitle, Grid, IconButton, Tooltip } from '@mui/material';
+import { useSnackbar } from 'notistack';
+import { useDownloadExcelFile } from 'src/hooks/excel';
+import { useDeleteUser, useGroupUsers, useImport } from 'src/hooks/user';
+import { useRouter } from 'src/routes/hooks';
+import { TGroupUser } from 'src/types/user';
+import { base64ToBlob, saveDownloadedFileBlobFormat } from 'src/utils';
+import type { UserProps } from '../team-table-row';
+
+// ----------------------------------------------------------------------
+
 export function TeamView() {
+  const [openModal, setOpenModal] = useState(false);
+  const [importFile, setImportFile] = useState<File>();
+  const [filterName, setFilterName] = useState('');
+
+  const router = useRouter();
+  const table = useTable();
+  const { enqueueSnackbar } = useSnackbar();
+  const { isLoading, users, refetchUsers } = useGroupUsers();
+  const { deleteUserById } = useDeleteUser();
+  const { isDownloading, onDownloadFile } = useDownloadExcelFile({
+    endpoint: '/users/download-example',
+    fileName: 'ThêmNhânViên_FileExcelMẫu.xlsx',
+  });
+  const {
+    onImportFile,
+    isSubmitting,
+    response,
+    onResetState: resetImportResponse,
+  } = useImport({
+    endpoint: '/users/import-user',
+    file: importFile,
+  });
+
+  const dataFiltered: UserProps[] = applyFilter({
+    inputData: users,
+    comparator: getComparator(table.order, table.orderBy),
+    filterName,
+  });
+
+  const notFound = !dataFiltered.length && !!filterName;
+
+  const onImportFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const target = event.target as HTMLInputElement;
+      if (target.files) {
+        setImportFile(target.files[0]);
+        resetImportResponse();
+      }
+    },
+    [resetImportResponse]
+  );
+
+  const onImportFileAndRefetchData = useCallback(async () => {
+    await onImportFile();
+    refetchUsers();
+  }, [onImportFile, refetchUsers]);
+
+  const onSaveImportResultFile = useCallback(() => {
+    const responseFileBlob = base64ToBlob(response?.file);
+
+    if (!responseFileBlob) {
+      enqueueSnackbar('Lỗi không tìm thấy Blob File', { variant: 'error' });
+      return;
+    }
+    saveDownloadedFileBlobFormat(responseFileBlob, 'ThêmNhânViên_FileExcelKếtQuả.xlsx');
+  }, [response, enqueueSnackbar]);
+
+  const resetImportFileRequest = useCallback(() => setImportFile(undefined), []);
+
+  const onResetDialogState = useCallback(() => {
+    resetImportFileRequest();
+    resetImportResponse();
+  }, [resetImportFileRequest, resetImportResponse]);
+
+  const onGotoUserDetailPage = useCallback(
+    (user: TGroupUser) => {
+      router.push(`/nhan-vien/${user.id}`);
+    },
+    [router]
+  );
+
+  const onSoftDeleteUser = useCallback(
+    async (user: TGroupUser) => {
+      await deleteUserById(user.id);
+      refetchUsers();
+    },
+    [deleteUserById, refetchUsers]
+  );
+
   return (
     <DashboardContent>
-      <Typography>Team View</Typography>
+      <Box display="flex" alignItems="center" mb={5}>
+        <Typography variant="h4" flexGrow={1}>
+          Phòng ban ({users.length})
+        </Typography>
+        <Button
+          variant="contained"
+          color="inherit"
+          startIcon={<Iconify icon="mingcute:add-line" />}
+          onClick={() => setOpenModal(true)}
+        >
+          Thêm mới
+        </Button>
+      </Box>
+
+      <Card>
+        <UserTableToolbar
+          numSelected={table.selected.length}
+          filterName={filterName}
+          onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
+            setFilterName(event.target.value);
+            table.onResetPage();
+          }}
+        />
+
+        <Scrollbar>
+          <TableContainer sx={{ overflow: 'unset' }}>
+            <Table sx={{ minWidth: 800 }}>
+              <UserTableHead
+                order={table.order}
+                orderBy={table.orderBy}
+                rowCount={users.length}
+                numSelected={table.selected.length}
+                onSort={table.onSort}
+                onSelectAllRows={(checked) =>
+                  table.onSelectAllRows(
+                    checked,
+                    users.map((user) => user.identifyCard)
+                  )
+                }
+                headLabel={[
+                  { id: 'name', label: 'Tên phòng ban' },
+                  { id: 'hotline', label: 'Hotline' },
+                  { id: '' },
+                ]}
+              />
+              <TableBody>
+                {dataFiltered
+                  .slice(
+                    table.page * table.rowsPerPage,
+                    table.page * table.rowsPerPage + table.rowsPerPage
+                  )
+                  .map((row) => (
+                    <UserTableRow
+                      key={row.identifyCard}
+                      row={row}
+                      selected={table.selected.includes(row.identifyCard)}
+                      onSelectRow={() => table.onSelectRow(row.identifyCard)}
+                      onDeleteUser={onSoftDeleteUser}
+                      onGotoDetail={onGotoUserDetailPage}
+                    />
+                  ))}
+
+                <TableEmptyRows
+                  height={68}
+                  emptyRows={emptyRows(table.page, table.rowsPerPage, users.length)}
+                />
+
+                {notFound && <TableNoData searchQuery={filterName} />}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Scrollbar>
+
+        <TablePagination
+          component="div"
+          page={table.page}
+          count={users.length}
+          rowsPerPage={table.rowsPerPage}
+          onPageChange={table.onChangePage}
+          rowsPerPageOptions={[5, 15, 25, users.length]}
+          onRowsPerPageChange={table.onChangeRowsPerPage}
+        />
+      </Card>
+
+      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+        <Box sx={{ p: 4, pb: 8 }}>
+          <Box position="relative">
+            <DialogTitle sx={{ textAlign: 'center' }}>Nhập bằng file excel</DialogTitle>
+            <Box position="absolute" top="15%" left={0}>
+              <Tooltip title="Thực hiện lại">
+                <IconButton onClick={onResetDialogState}>
+                  <Iconify icon="mage:reload" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+
+            <Box position="absolute" top="15%" right={0}>
+              <Tooltip title="Đóng">
+                <IconButton onClick={() => setOpenModal(false)}>
+                  <Iconify icon="material-symbols:close" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+          <Grid container rowGap={3}>
+            <Grid item xs={12}>
+              <DialogContentText sx={{ mb: 1 }}>1. Tải về file excel mẫu:</DialogContentText>
+              <Button
+                variant="contained"
+                color="inherit"
+                startIcon={<Iconify icon="material-symbols:download" />}
+                onClick={onDownloadFile}
+                disabled={isDownloading}
+              >
+                Tải về
+              </Button>
+            </Grid>
+
+            <Grid item xs={12}>
+              <DialogContentText sx={{ mb: 2 }}>
+                2. Tải lên file excel đã điền thông tin Nhân viên:
+              </DialogContentText>
+              <Grid container spacing={1}>
+                <Grid item xs={12} md={12}>
+                  <TextField
+                    type="file"
+                    onChange={onImportFileChange}
+                    label="Chọn file excel"
+                    InputLabelProps={{ shrink: true, sx: { fontSize: 20 } }}
+                    inputProps={{
+                      accept:
+                        '.xls, .xlsx, .csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv',
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={12}>
+                  <Button
+                    onClick={onImportFileAndRefetchData}
+                    variant="contained"
+                    color="info"
+                    startIcon={<Iconify icon="line-md:upload-loop" />}
+                    disabled={!importFile || isSubmitting}
+                  >
+                    Tải lên
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+              <DialogContentText sx={{ mb: 2 }}>3. Kết quả:</DialogContentText>
+              <Grid container spacing={1}>
+                <Grid item xs={12} md={12}>
+                  <Typography>Tổng số bản ghi gửi lên: {response?.totalRecord ?? '-'}</Typography>
+                  <Typography>
+                    Số bản ghi nhập thành công: {response?.numSuccessRecord ?? '-'}
+                  </Typography>
+                  <Typography>
+                    Số bản ghi nhập thất bại: {response?.numErrorRecord ?? '-'}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} md={12}>
+                  <Button
+                    onClick={onSaveImportResultFile}
+                    variant="contained"
+                    color="primary"
+                    startIcon={<Iconify icon="carbon:result-new" />}
+                    disabled={!response?.file}
+                  >
+                    Tải về xem file kết quả
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Box>
+      </Dialog>
     </DashboardContent>
   );
+}
+// ----------------------------------------------------------------------
+
+export function useTable() {
+  const [page, setPage] = useState(0);
+  const [orderBy, setOrderBy] = useState('name');
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+
+  const onSort = useCallback(
+    (id: string) => {
+      const isAsc = orderBy === id && order === 'asc';
+      setOrder(isAsc ? 'desc' : 'asc');
+      setOrderBy(id);
+    },
+    [order, orderBy]
+  );
+
+  const onSelectAllRows = useCallback((checked: boolean, newSelecteds: string[]) => {
+    if (checked) {
+      setSelected(newSelecteds);
+      return;
+    }
+    setSelected([]);
+  }, []);
+
+  const onSelectRow = useCallback(
+    (inputValue: string) => {
+      const newSelected = selected.includes(inputValue)
+        ? selected.filter((value) => value !== inputValue)
+        : [...selected, inputValue];
+
+      setSelected(newSelected);
+    },
+    [selected]
+  );
+
+  const onResetPage = useCallback(() => {
+    setPage(0);
+  }, []);
+
+  const onChangePage = useCallback((event: unknown, newPage: number) => {
+    setPage(newPage);
+  }, []);
+
+  const onChangeRowsPerPage = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setRowsPerPage(parseInt(event.target.value, 10));
+      onResetPage();
+    },
+    [onResetPage]
+  );
+
+  return {
+    page,
+    order,
+    onSort,
+    orderBy,
+    selected,
+    rowsPerPage,
+    onSelectRow,
+    onResetPage,
+    onChangePage,
+    onSelectAllRows,
+    onChangeRowsPerPage,
+  };
 }
