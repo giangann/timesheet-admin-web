@@ -1,14 +1,20 @@
-import TextField from '@mui/material/TextField';
 import { useCallback, useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
+import Grid from '@mui/material/Grid';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+
+import type { DialogProps } from '@mui/material/Dialog';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 
@@ -17,107 +23,84 @@ import { Scrollbar } from 'src/components/scrollbar';
 
 import { TableEmptyRows } from '../table-empty-rows';
 import { TableNoData } from '../table-no-data';
-import { UserTableHead } from '../team-table-head';
-import { UserTableRow } from '../team-table-row';
+import { TeamTableHead } from '../team-table-head';
 import { UserTableToolbar } from '../team-table-toolbar';
 import { applyFilter, emptyRows, getComparator } from '../utils';
 
-import { Dialog, DialogContentText, DialogTitle, Grid, IconButton, Tooltip } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import { useDownloadExcelFile } from 'src/hooks/excel';
-import { useDeleteUser, useGroupUsers, useImport } from 'src/hooks/user';
+import { useForm } from 'react-hook-form';
+import { useCreateTeam, useDeleteTeam, useGroupTeams } from 'src/hooks/team';
 import { useRouter } from 'src/routes/hooks';
-import { TGroupUser } from 'src/types/user';
-import { base64ToBlob, saveDownloadedFileBlobFormat } from 'src/utils';
-import type { UserProps } from '../team-table-row';
+import { TGroupTeam, TTeamCreate, TTeamCreateFields } from 'src/types/team';
+import { hasNullishOrEmptyString, pickProperties } from 'src/utils';
+import { TeamProps, TeamTableRow } from '../team-table-row';
 
 // ----------------------------------------------------------------------
 
 export function TeamView() {
   const [openModal, setOpenModal] = useState(false);
-  const [importFile, setImportFile] = useState<File>();
   const [filterName, setFilterName] = useState('');
 
+  const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
   const table = useTable();
-  const { enqueueSnackbar } = useSnackbar();
-  const { isLoading, users, refetchUsers } = useGroupUsers();
-  const { deleteUserById } = useDeleteUser();
-  const { isDownloading, onDownloadFile } = useDownloadExcelFile({
-    endpoint: '/users/download-example',
-    fileName: 'ThêmNhânViên_FileExcelMẫu.xlsx',
-  });
-  const {
-    onImportFile,
-    isSubmitting,
-    response,
-    onResetState: resetImportResponse,
-  } = useImport({
-    endpoint: '/users/import-user',
-    file: importFile,
-  });
+  const { deleteTeamById } = useDeleteTeam();
+  const { onCreateNewTeam } = useCreateTeam();
+  const { teams, onFetchTeams: refetchTeams } = useGroupTeams();
 
-  const dataFiltered: UserProps[] = applyFilter({
-    inputData: users,
+  const dataFiltered: TeamProps[] = applyFilter({
+    inputData: teams,
     comparator: getComparator(table.order, table.orderBy),
     filterName,
   });
 
   const notFound = !dataFiltered.length && !!filterName;
 
-  const onImportFileChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const target = event.target as HTMLInputElement;
-      if (target.files) {
-        setImportFile(target.files[0]);
-        resetImportResponse();
-      }
-    },
-    [resetImportResponse]
-  );
-
-  const onImportFileAndRefetchData = useCallback(async () => {
-    await onImportFile();
-    refetchUsers();
-  }, [onImportFile, refetchUsers]);
-
-  const onSaveImportResultFile = useCallback(() => {
-    const responseFileBlob = base64ToBlob(response?.file);
-
-    if (!responseFileBlob) {
-      enqueueSnackbar('Lỗi không tìm thấy Blob File', { variant: 'error' });
-      return;
-    }
-    saveDownloadedFileBlobFormat(responseFileBlob, 'ThêmNhânViên_FileExcelKếtQuả.xlsx');
-  }, [response, enqueueSnackbar]);
-
-  const resetImportFileRequest = useCallback(() => setImportFile(undefined), []);
-
-  const onResetDialogState = useCallback(() => {
-    resetImportFileRequest();
-    resetImportResponse();
-  }, [resetImportFileRequest, resetImportResponse]);
-
-  const onGotoUserDetailPage = useCallback(
-    (user: TGroupUser) => {
-      router.push(`/nhan-vien/${user.id}`);
+  const onGotoTeamDetailPage = useCallback(
+    (team: TGroupTeam) => {
+      router.push(`/phong-ban/${team.id}`);
     },
     [router]
   );
 
-  const onSoftDeleteUser = useCallback(
-    async (user: TGroupUser) => {
-      await deleteUserById(user.id);
-      refetchUsers();
+  const onSoftDeleteTeam = useCallback(
+    async (team: TGroupTeam) => {
+      await deleteTeamById(team.id);
+      refetchTeams();
     },
-    [deleteUserById, refetchUsers]
+    [deleteTeamById, refetchTeams]
+  );
+
+  const onCreateTeam = useCallback(
+    async (fields: TTeamCreateFields) => {
+      // validate
+      const requiredFields = pickProperties(fields, ['name']);
+      if (hasNullishOrEmptyString(requiredFields)) {
+        enqueueSnackbar('Tên không được để trống', { variant: 'warning' });
+        return;
+      }
+
+      // process data
+      const data: TTeamCreate = {
+        hotline: fields.hotline ?? '',
+        name: fields.name ?? '',
+      };
+
+      // make api call
+      await onCreateNewTeam(data);
+
+      // side effect
+      refetchTeams();
+      setOpenModal(false);
+    },
+    [refetchTeams, onCreateNewTeam, enqueueSnackbar, setOpenModal]
   );
 
   return (
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
-          Phòng ban ({users.length})
+          Phòng ban
         </Typography>
         <Button
           variant="contained"
@@ -142,16 +125,16 @@ export function TeamView() {
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
-              <UserTableHead
+              <TeamTableHead
                 order={table.order}
                 orderBy={table.orderBy}
-                rowCount={users.length}
+                rowCount={teams.length}
                 numSelected={table.selected.length}
                 onSort={table.onSort}
                 onSelectAllRows={(checked) =>
                   table.onSelectAllRows(
                     checked,
-                    users.map((user) => user.identifyCard)
+                    teams.map((team) => team.id.toString())
                   )
                 }
                 headLabel={[
@@ -167,19 +150,19 @@ export function TeamView() {
                     table.page * table.rowsPerPage + table.rowsPerPage
                   )
                   .map((row) => (
-                    <UserTableRow
-                      key={row.identifyCard}
+                    <TeamTableRow
+                      key={row.id.toString()}
                       row={row}
-                      selected={table.selected.includes(row.identifyCard)}
-                      onSelectRow={() => table.onSelectRow(row.identifyCard)}
-                      onDeleteUser={onSoftDeleteUser}
-                      onGotoDetail={onGotoUserDetailPage}
+                      selected={table.selected.includes(row.id.toString())}
+                      onSelectRow={() => table.onSelectRow(row.id.toString())}
+                      onDeleteTeam={onSoftDeleteTeam}
+                      onGotoDetail={onGotoTeamDetailPage}
                     />
                   ))}
 
                 <TableEmptyRows
                   height={68}
-                  emptyRows={emptyRows(table.page, table.rowsPerPage, users.length)}
+                  emptyRows={emptyRows(table.page, table.rowsPerPage, teams.length)}
                 />
 
                 {notFound && <TableNoData searchQuery={filterName} />}
@@ -191,112 +174,85 @@ export function TeamView() {
         <TablePagination
           component="div"
           page={table.page}
-          count={users.length}
+          count={teams.length}
           rowsPerPage={table.rowsPerPage}
           onPageChange={table.onChangePage}
-          rowsPerPageOptions={[5, 15, 25, users.length]}
+          rowsPerPageOptions={[5, 15, 25, teams.length]}
           onRowsPerPageChange={table.onChangeRowsPerPage}
         />
+
+        {openModal && (
+          <CreateTeamDialog
+            cb={onCreateTeam}
+            dialogProps={{ open: openModal, onClose: () => setOpenModal(false) }}
+          />
+        )}
       </Card>
-
-      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-        <Box sx={{ p: 4, pb: 8 }}>
-          <Box position="relative">
-            <DialogTitle sx={{ textAlign: 'center' }}>Nhập bằng file excel</DialogTitle>
-            <Box position="absolute" top="15%" left={0}>
-              <Tooltip title="Thực hiện lại">
-                <IconButton onClick={onResetDialogState}>
-                  <Iconify icon="mage:reload" />
-                </IconButton>
-              </Tooltip>
-            </Box>
-
-            <Box position="absolute" top="15%" right={0}>
-              <Tooltip title="Đóng">
-                <IconButton onClick={() => setOpenModal(false)}>
-                  <Iconify icon="material-symbols:close" />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          </Box>
-          <Grid container rowGap={3}>
-            <Grid item xs={12}>
-              <DialogContentText sx={{ mb: 1 }}>1. Tải về file excel mẫu:</DialogContentText>
-              <Button
-                variant="contained"
-                color="inherit"
-                startIcon={<Iconify icon="material-symbols:download" />}
-                onClick={onDownloadFile}
-                disabled={isDownloading}
-              >
-                Tải về
-              </Button>
-            </Grid>
-
-            <Grid item xs={12}>
-              <DialogContentText sx={{ mb: 2 }}>
-                2. Tải lên file excel đã điền thông tin Nhân viên:
-              </DialogContentText>
-              <Grid container spacing={1}>
-                <Grid item xs={12} md={12}>
-                  <TextField
-                    type="file"
-                    onChange={onImportFileChange}
-                    label="Chọn file excel"
-                    InputLabelProps={{ shrink: true, sx: { fontSize: 20 } }}
-                    inputProps={{
-                      accept:
-                        '.xls, .xlsx, .csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv',
-                    }}
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={12}>
-                  <Button
-                    onClick={onImportFileAndRefetchData}
-                    variant="contained"
-                    color="info"
-                    startIcon={<Iconify icon="line-md:upload-loop" />}
-                    disabled={!importFile || isSubmitting}
-                  >
-                    Tải lên
-                  </Button>
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Grid item xs={12}>
-              <DialogContentText sx={{ mb: 2 }}>3. Kết quả:</DialogContentText>
-              <Grid container spacing={1}>
-                <Grid item xs={12} md={12}>
-                  <Typography>Tổng số bản ghi gửi lên: {response?.totalRecord ?? '-'}</Typography>
-                  <Typography>
-                    Số bản ghi nhập thành công: {response?.numSuccessRecord ?? '-'}
-                  </Typography>
-                  <Typography>
-                    Số bản ghi nhập thất bại: {response?.numErrorRecord ?? '-'}
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} md={12}>
-                  <Button
-                    onClick={onSaveImportResultFile}
-                    variant="contained"
-                    color="primary"
-                    startIcon={<Iconify icon="carbon:result-new" />}
-                    disabled={!response?.file}
-                  >
-                    Tải về xem file kết quả
-                  </Button>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Box>
-      </Dialog>
     </DashboardContent>
   );
 }
+
+type CreateTeamDialogProps = {
+  dialogProps: DialogProps;
+  cb: (fields: TTeamCreateFields) => void;
+};
+const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ dialogProps, cb }) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<TTeamCreateFields>();
+
+  return (
+    <Dialog {...dialogProps}>
+      <Box px={{ xs: 2, md: 4 }} pb={{ xs: 3, md: 6 }} pt={{ xs: 1, md: 2 }}>
+        <DialogTitle sx={{ pl: 0.5, mb: { xs: 1, md: 2 } }}>Tạo phòng ban mới</DialogTitle>
+        <Grid container spacing={{ xs: 0, md: 2 }}>
+          <Grid item xs={12} md={6}>
+            <TextField
+              {...register('name')}
+              label="Tên phòng ban"
+              placeholder="Nhập tên"
+              fullWidth
+              required
+              InputLabelProps={{ shrink: true }}
+              sx={{ mb: 3 }}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              {...register('hotline')}
+              label="Hotline"
+              placeholder="Nhập hotline"
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              sx={{ mb: 3 }}
+            />
+          </Grid>
+        </Grid>
+
+        <DialogActions sx={{ pr: 0 }}>
+          <Button
+            variant="outlined"
+            color="inherit"
+            startIcon={<Iconify icon="codicon:close" />}
+            onClick={(event) => dialogProps.onClose?.(event, 'backdropClick')}
+          >
+            Đóng
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<Iconify icon="material-symbols:add" />}
+            onClick={handleSubmit(cb)}
+            disabled={isSubmitting}
+          >
+            {`Tạo`.padEnd(5)}
+          </Button>
+        </DialogActions>
+      </Box>
+    </Dialog>
+  );
+};
 // ----------------------------------------------------------------------
 
 export function useTable() {

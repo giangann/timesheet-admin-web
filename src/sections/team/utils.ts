@@ -1,4 +1,4 @@
-import type { UserProps } from './team-table-row';
+import type { TeamProps } from './team-table-row';
 
 // ----------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ export function getComparator<Key extends keyof any>(
 // ----------------------------------------------------------------------
 
 type ApplyFilterProps = {
-  inputData: UserProps[];
+  inputData: TeamProps[];
   filterName: string;
   comparator: (a: any, b: any) => number;
 };

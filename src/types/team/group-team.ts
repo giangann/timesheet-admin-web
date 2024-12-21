@@ -7,9 +7,11 @@ export type TGroupTeam = {
 
 export type TTeamCreate = {
   name: string;
+  hotline: string;
 };
 
-export type TTeam = {
-  name: string;
-  hotline: string;
+export type TTeamCreateFields = {
+  name?: string;
+  hotline?: string;
+  code?: string;
 };

@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 
-import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
@@ -20,27 +19,27 @@ import {
   Tooltip,
 } from '@mui/material';
 import { Iconify } from 'src/components/iconify';
-import { TGroupUser } from 'src/types/user';
+import { TGroupTeam } from 'src/types/team';
 
 // ----------------------------------------------------------------------
 
-export type UserProps = TGroupUser;
+export type TeamProps = TGroupTeam;
 
-type UserTableRowProps = {
-  row: UserProps;
+type TeamTableRowProps = {
+  row: TeamProps;
   selected: boolean;
   onSelectRow: () => void;
-  onDeleteUser: (row: UserProps) => void;
-  onGotoDetail: (row: UserProps) => void;
+  onDeleteTeam: (row: TeamProps) => void;
+  onGotoDetail: (row: TeamProps) => void;
 };
 
-export function UserTableRow({
+export function TeamTableRow({
   row,
   selected,
   onSelectRow,
-  onDeleteUser,
+  onDeleteTeam,
   onGotoDetail,
-}: UserTableRowProps) {
+}: TeamTableRowProps) {
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
   const [openCfModal, setOpenCfModal] = useState(false);
 
@@ -72,8 +71,8 @@ export function UserTableRow({
 
   const handleAcceptDelete = useCallback(() => {
     handleCloseConfirmModal();
-    onDeleteUser(row);
-  }, [handleCloseConfirmModal, onDeleteUser, row]);
+    onDeleteTeam(row);
+  }, [handleCloseConfirmModal, onDeleteTeam, row]);
   return (
     <>
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
@@ -81,20 +80,8 @@ export function UserTableRow({
           <Checkbox disableRipple checked={selected} onChange={onSelectRow} />
         </TableCell>
 
-        <TableCell component="th" scope="row">
-          <Box gap={2} display="flex" alignItems="center">
-            <Avatar alt={row.name} src="null" />
-            {row.name}
-          </Box>
-        </TableCell>
-
-        <TableCell>{row.team.name}</TableCell>
-        <TableCell>{row.team.hotline ?? '-'}</TableCell>
-
-        <TableCell>{row.roleName}</TableCell>
-        <TableCell>{row.phone ?? '-'}</TableCell>
-        <TableCell>{row.address ?? '-'}</TableCell>
-        <TableCell>{row.email ?? '-'}</TableCell>
+        <TableCell>{row.name}</TableCell>
+        <TableCell>{row.hotline ?? '-'}</TableCell>
 
         <TableCell align="right">
           <IconButton onClick={handleOpenPopover}>

@@ -2,11 +2,11 @@ import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useState } from 'react';
 import { TGroupUser } from 'src/types/user';
 import { useApi } from '../use-api';
-import { TTeamCreate } from 'src/types/team';
+import { TGroupTeam, TTeamCreate } from 'src/types/team';
 
 export const useGroupTeams = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [teams, setTeams] = useState<TGroupUser[]>([]);
+  const [teams, setTeams] = useState<TGroupTeam[]>([]);
   const { enqueueSnackbar } = useSnackbar();
   const { get } = useApi();
 
@@ -71,7 +71,7 @@ export const useDeleteTeam = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { remove } = useApi();
 
-  const onDeleteTeam = useCallback(
+  const deleteTeamById = useCallback(
     async (id: number) => {
       setIsLoading(true);
       try {
@@ -92,5 +92,5 @@ export const useDeleteTeam = () => {
     [remove, enqueueSnackbar, setIsLoading]
   );
 
-  return { onDeleteTeam, isLoading };
+  return { deleteTeamById, isLoading };
 };

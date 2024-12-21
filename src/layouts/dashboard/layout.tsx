@@ -62,7 +62,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
         router.replace('/sign-in');
       }
     }
-    checkToken();
+    // checkToken();
     // only call when is not first render
   }, [router, verifyToken]);
 
