@@ -15,3 +15,15 @@ export type TTeamCreateFields = {
   hotline?: string;
   code?: string;
 };
+
+export type TTeamUpdate = {
+  name: string;
+  hotline?: string;
+  code?: string;
+};
+
+export type TTeamUpdateFields = {
+  name?: string;
+  hotline?: string;
+  code?: string;
+};

@@ -1,8 +1,9 @@
 import { useSnackbar } from 'notistack';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TGroupUser } from 'src/types/user';
 import { useApi } from '../use-api';
-import { TGroupTeam, TTeamCreate } from 'src/types/team';
+import { TGroupTeam, TTeamCreate, TTeamUpdate } from 'src/types/team';
+import { arrayObjectToMap } from 'src/utils';
 
 export const useGroupTeams = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +34,15 @@ export const useGroupTeams = () => {
   }, [get, enqueueSnackbar, onFetchTeams]);
 
   return { teams, isLoading, onFetchTeams };
+};
+
+export const useGetTeamDetailFromTeamList = (teamId: number) => {
+  const { isLoading, teams, onFetchTeams } = useGroupTeams();
+
+  const teamMap: Map<string, TGroupTeam> = useMemo(() => arrayObjectToMap(teams, 'id'), [teams]);
+  const teamDetail = useMemo(() => teamMap.get(teamId.toString()), [teamMap, teamId]);
+
+  return { isLoading, teamDetail, onFetchTeamDetail: onFetchTeams };
 };
 
 // write what?
@@ -66,6 +76,35 @@ export const useCreateTeam = () => {
   return { isLoading, onCreateNewTeam };
 };
 
+export const useUpdateTeam = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const { post } = useApi();
+
+  const onUpdateTeam = useCallback(
+    async (teamId: number, data: TTeamUpdate) => {
+      setIsLoading(true);
+      try {
+        const response = await post('/teams', { ...data, id: teamId });
+        if (response.statusCode === 200) {
+          enqueueSnackbar('Cập nhật thành công', { variant: 'success' });
+        } else {
+          enqueueSnackbar(response.error ?? response.message ?? 'Unknown error', {
+            variant: 'error',
+          });
+        }
+      } catch (error: any) {
+        enqueueSnackbar(error.message ?? 'Unknown error', { variant: 'error' });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [enqueueSnackbar, setIsLoading, post]
+  );
+
+  return { isLoading, onUpdateTeam };
+};
+
 export const useDeleteTeam = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
@@ -85,7 +124,7 @@ export const useDeleteTeam = () => {
         }
       } catch (error: any) {
         enqueueSnackbar(error.message ?? 'Unknown error', { variant: 'error' });
-      } finally { 
+      } finally {
         setIsLoading(false);
       }
     },
