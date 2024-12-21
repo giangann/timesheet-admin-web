@@ -60,11 +60,12 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
         await verifyToken();
       } catch (error: any) {
         router.replace('/sign-in');
+        enqueueSnackbar(error?.message ?? 'Lỗi không xác định', { variant: 'error' });
       }
     }
-    // checkToken();
+    checkToken();
     // only call when is not first render
-  }, [router, verifyToken]);
+  }, [router, verifyToken, enqueueSnackbar]);
 
   useEffect(() => {
     async function onInitUserData() {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { ROLE_CODE } from 'src/configs';
 import { useLocalStorage } from 'src/hooks/use-local-storage';
 import { useRouter } from 'src/routes/hooks';
 import { getApi, postApi } from 'src/services/api';
@@ -55,8 +56,12 @@ export function AuthProvider({ children }: ProviderProps) {
 
     const responseJson = await getApi('/auth/verify-token', { token: tokenValue });
     if (responseJson.statusCode !== 200) {
-      throw new Error(responseJson.error);
+      throw new Error("Phiên đăng nhập đã hết, hãy đăng nhập lại");
+    } else {
+      const roleCode = responseJson.data?.user?.roleCode;
+      if (roleCode !== ROLE_CODE.ADMIN) throw new Error(`Bạn không có quyền truy cập dashboard`);
     }
+
     return responseJson;
   }, [loading, tokenValue]);
 
@@ -74,7 +79,7 @@ export function AuthProvider({ children }: ProviderProps) {
       }
       return responseJson;
     } catch (error: any) {
-      throw new Error (error.message);
+      throw new Error(error.message);
     }
   }, [verifyToken, setUserInfoValue]);
 
