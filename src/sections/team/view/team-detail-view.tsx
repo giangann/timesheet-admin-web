@@ -60,7 +60,7 @@ export function TeamDetailView() {
       // reset
       reset();
     },
-    [onUpdateTeam, onFetchTeamDetail, reset]
+    [enqueueSnackbar,onUpdateTeam, onFetchTeamDetail, reset, teamId]
   );
   return (
     <DashboardContent>
