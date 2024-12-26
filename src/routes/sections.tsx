@@ -19,6 +19,8 @@ export const TeamOutsideWorkingTimePage = lazy(() => import('src/pages/team-owt'
 export const EmployeeOutsideWorkingTimePage = lazy(() => import('src/pages/emp-owt'));
 
 export const TimesheetPage = lazy(() => import('src/pages/timesheet'));
+export const SystemSettingPage = lazy(() => import('src/pages/system-setting'));
+
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
@@ -55,6 +57,7 @@ export function Router() {
         { path: 'ngoai-gio-don-vi', element: <TeamOutsideWorkingTimePage /> },
         { path: 'ngoai-gio-ca-nhan', element: <EmployeeOutsideWorkingTimePage /> },
         { path: 'bang-cham-cong', element: <TimesheetPage /> },
+        { path: 'cai-dat-he-thong', element: <SystemSettingPage /> },
       ],
     },
     {

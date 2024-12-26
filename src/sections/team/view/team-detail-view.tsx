@@ -60,7 +60,7 @@ export function TeamDetailView() {
       // reset
       reset();
     },
-    [enqueueSnackbar,onUpdateTeam, onFetchTeamDetail, reset, teamId]
+    [enqueueSnackbar, onUpdateTeam, onFetchTeamDetail, reset, teamId]
   );
   return (
     <DashboardContent>
@@ -104,13 +104,14 @@ export function TeamDetailView() {
               <Grid container spacing={2} mt={{ xs: 1, md: 2 }}>
                 <Grid item xs={12} md={4} xl={3}>
                   <LoadingButton
+                    onClick={handleSubmit(onSave)}
+                    disabled={!formState.isDirty}
+                    loading={formState.isSubmitting}
                     fullWidth
                     size="large"
                     type="submit"
                     color="inherit"
                     variant="contained"
-                    disabled={!formState.isDirty}
-                    onClick={handleSubmit(onSave)}
                   >
                     Lưu
                   </LoadingButton>

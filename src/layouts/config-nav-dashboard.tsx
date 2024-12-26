@@ -39,4 +39,9 @@ export const navData = [
     path: '/bang-cham-cong',
     icon: icon('ic-cart'),
   },
+  {
+    title: 'Cài đặt hệ thống',
+    path: '/cai-dat-he-thong',
+    icon: icon('ic-disabled'),
+  },
 ];
