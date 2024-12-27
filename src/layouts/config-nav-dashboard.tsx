@@ -20,7 +20,7 @@ export const navData = [
   },
   {
     title: 'Phòng ban',
-    path: 'phong-ban',
+    path: '/phong-ban',
     icon: icon('ic-blog'),
     
   },
