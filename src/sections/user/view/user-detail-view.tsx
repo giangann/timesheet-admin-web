@@ -37,7 +37,7 @@ export function UserDetailView() {
 
   const teamOpts = useMemo(() => dataToOptions(teams, 'name', 'id'), [teams]);
   const roleOpts = useMemo(() => dataToOptions(roles, 'name', 'id'), [roles]);
-  console.log({ roleOpts });
+  
   const onSave = useCallback(
     async (values: TGroupUserUpdateFormFields) => {
       // get dirty values

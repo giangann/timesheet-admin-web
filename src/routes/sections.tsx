@@ -21,6 +21,8 @@ export const EmployeeOutsideWorkingTimePage = lazy(() => import('src/pages/emp-o
 export const TimesheetPage = lazy(() => import('src/pages/timesheet'));
 export const SystemSettingPage = lazy(() => import('src/pages/system-setting'));
 
+export const BaseSalaryDetailPage = lazy(() => import('src/pages/base-salary-detail'));
+
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
@@ -58,6 +60,7 @@ export function Router() {
         { path: 'ngoai-gio-ca-nhan', element: <EmployeeOutsideWorkingTimePage /> },
         { path: 'bang-cham-cong', element: <TimesheetPage /> },
         { path: 'cai-dat-he-thong', element: <SystemSettingPage /> },
+        { path: 'cai-dat-he-thong/luong-co-ban/:id', element: <BaseSalaryDetailPage /> },
       ],
     },
     {

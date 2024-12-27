@@ -2,28 +2,18 @@ import { LoadingButton } from '@mui/lab';
 import {
   Box,
   Card,
-  FormControl,
   Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  Skeleton,
   TextField,
-  Typography,
+  Typography
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
-import { useGroupRoles } from 'src/hooks/role';
-import { useGetTeamDetailFromTeamList, useGroupTeams, useUpdateTeam } from 'src/hooks/team';
-import { useGetUserDetailFromUserList, useUserUpdate } from 'src/hooks/user';
+import { useGetTeamDetailFromTeamList, useUpdateTeam } from 'src/hooks/team';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { TTeamUpdate, TTeamUpdateFields } from 'src/types/team';
-import { TGroupUser, TGroupUserUpdate, TGroupUserUpdateFormFields } from 'src/types/user';
 import { hasNullishOrEmptyString, pickProperties } from 'src/utils';
-import { dataToOptions } from 'src/utils/array-util';
-import { dirtyValues } from 'src/utils/format-field-values';
 
 // ----------------------------------------------------------------------
 

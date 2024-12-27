@@ -1,1 +1,1 @@
-export * from './system-setting';
+export * from './base-salary';

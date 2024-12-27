@@ -1,1 +1,1 @@
-export * from './useSystemSetting'
+export * from './useBaseSalary'
