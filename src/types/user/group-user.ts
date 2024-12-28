@@ -13,6 +13,9 @@ export type TGroupUser = {
     code: string | null;
     hotline: string | null;
   };
+  salaryCoefficient: number;
+  positionBonusCoefficient: number;
+  otherBonusCoefficient: number;
 };
 
 export type TGroupUserUpdateFormFields = {
@@ -24,6 +27,9 @@ export type TGroupUserUpdateFormFields = {
   role: number | undefined;
   identifyCard: string | undefined;
   password: string | undefined;
+  salaryCoefficient: number | undefined;
+  positionBonusCoefficient: number | undefined;
+  otherBonusCoefficient: number | undefined;
 };
 
 export type TGroupUserUpdate = Partial<TGroupUserUpdateFormFields>;

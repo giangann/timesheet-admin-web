@@ -165,6 +165,10 @@ export function UserView() {
                   { id: 'address', label: 'Địa chỉ' },
                   { id: 'email', label: 'Email' },
 
+                  { id: 'salaryCoefficient', label: 'Hệ số lương' },
+                  { id: 'positionBonusCoefficient', label: 'Hệ số chức vụ' },
+                  { id: 'otherBonusCoefficient', label: 'Hệ số phụ cấp khác' },
+
                   { id: '' },
                 ]}
               />

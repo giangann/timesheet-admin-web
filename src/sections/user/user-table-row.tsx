@@ -96,6 +96,10 @@ export function UserTableRow({
         <TableCell>{row.address ?? '-'}</TableCell>
         <TableCell>{row.email ?? '-'}</TableCell>
 
+        <TableCell>{row.salaryCoefficient ?? '-'}</TableCell>
+        <TableCell>{row.positionBonusCoefficient ?? '-'}</TableCell>
+        <TableCell>{row.otherBonusCoefficient ?? '-'}</TableCell>
+
         <TableCell align="right">
           <IconButton onClick={handleOpenPopover}>
             <Iconify icon="eva:more-vertical-fill" />

@@ -37,7 +37,7 @@ export function UserDetailView() {
 
   const teamOpts = useMemo(() => dataToOptions(teams, 'name', 'id'), [teams]);
   const roleOpts = useMemo(() => dataToOptions(roles, 'name', 'id'), [roles]);
-  
+
   const onSave = useCallback(
     async (values: TGroupUserUpdateFormFields) => {
       // get dirty values
@@ -118,7 +118,6 @@ export function UserDetailView() {
                     sx={{ mb: 3 }}
                   />
                 </Grid>
-
                 <Grid item xs={12} md={4} xl={3}>
                   {isTeamsLoading && <Skeleton variant="rounded" height={56} width="100%" />}
                   {!isTeamsLoading && (
@@ -142,7 +141,6 @@ export function UserDetailView() {
                     </FormControl>
                   )}
                 </Grid>
-
                 <Grid item xs={12} md={4} xl={3}>
                   {isRolesLoading && <Skeleton variant="rounded" height={56} width="100%" />}
                   {!isRolesLoading && (
@@ -170,7 +168,6 @@ export function UserDetailView() {
                     </FormControl>
                   )}
                 </Grid>
-
                 <Grid item xs={12} md={4} xl={3}>
                   <TextField
                     {...register('identifyCard')}
@@ -187,6 +184,39 @@ export function UserDetailView() {
                     {...register('password')}
                     label="Mật khẩu"
                     placeholder="Nhập mật khẩu mới"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ mb: 3 }}
+                  />
+                </Grid>
+                <Grid item xs={12} md={4} xl={3}>
+                  <TextField
+                    {...register('salaryCoefficient')}
+                    defaultValue={userDetail.salaryCoefficient}
+                    label="Hệ số lương"
+                    placeholder="Nhập hệ số lương"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ mb: 3 }}
+                  />
+                </Grid>{' '}
+                <Grid item xs={12} md={4} xl={3}>
+                  <TextField
+                    {...register('positionBonusCoefficient')}
+                    defaultValue={userDetail.positionBonusCoefficient}
+                    label="Hệ số chức vụ"
+                    placeholder="Nhập hệ số chức vụ"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ mb: 3 }}
+                  />
+                </Grid>
+                <Grid item xs={12} md={4} xl={3}>
+                  <TextField
+                    {...register('otherBonusCoefficient')}
+                    defaultValue={userDetail.otherBonusCoefficient}
+                    label="Phụ cấp khác"
+                    placeholder="Nhập hệ số phụ cấp khác"
                     fullWidth
                     InputLabelProps={{ shrink: true }}
                     sx={{ mb: 3 }}
