@@ -29,6 +29,7 @@ import { useDeleteUser, useGroupUsers, useImport } from 'src/hooks/user';
 import { useRouter } from 'src/routes/hooks';
 import { base64ToBlob, saveDownloadedFileBlobFormat } from 'src/utils';
 import type { UserProps } from '../user-table-row';
+import { useAuth } from 'src/hooks/use-auth';
 
 // ----------------------------------------------------------------------
 
@@ -42,6 +43,7 @@ export function UserView() {
   const { enqueueSnackbar } = useSnackbar();
   const { isLoading, users, refetchUsers } = useGroupUsers();
   const { deleteUserById } = useDeleteUser();
+  const { user: userInfo } = useAuth();
   const { isDownloading, onDownloadFile } = useDownloadExcelFile({
     endpoint: '/users/download-example',
     fileName: 'ThêmNhânViên_FileExcelMẫu.xlsx',
@@ -135,11 +137,14 @@ export function UserView() {
   }, [table]);
 
   const onDeleteMultiUser = useCallback(() => {
-    const userIds: string[] = table.selected;
-    userIds.forEach((idString) => onSoftDeleteUserById(parseInt(idString, 10)));
+    if (!userInfo) return;
 
+    const myUserId = userInfo.id.toString();
+    const userIds: string[] = table.selected.filter((id) => id !== myUserId);
+
+    userIds.forEach((idString) => onSoftDeleteUserById(parseInt(idString, 10)));
     onUnSelectAllRow();
-  }, [onSoftDeleteUserById, table, onUnSelectAllRow]);
+  }, [onSoftDeleteUserById, table, onUnSelectAllRow, userInfo]);
 
   return (
     <DashboardContent>

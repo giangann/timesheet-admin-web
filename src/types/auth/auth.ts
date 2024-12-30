@@ -4,6 +4,7 @@ export type TCredentials = {
 };
 
 export type TUserInfo = {
+  id: number;
   address: string;
   email: string;
   identifyCard: string;
