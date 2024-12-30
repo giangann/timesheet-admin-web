@@ -25,7 +25,7 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { TableEmptyRows } from '../table-empty-rows';
 import { TableNoData } from '../table-no-data';
 import { TeamTableHead } from '../team-table-head';
-import { UserTableToolbar } from '../team-table-toolbar';
+import { TeamTableToolbar } from '../team-table-toolbar';
 import { applyFilter, emptyRows, getComparator } from '../utils';
 
 import { useSnackbar } from 'notistack';
@@ -64,6 +64,20 @@ export function TeamView() {
     [router]
   );
 
+  const onSelectAllRow = useCallback(
+    (checked: boolean) => {
+      table.onSelectAllRows(
+        checked,
+        teams.map((team) => team.id.toString())
+      );
+    },
+    [teams, table]
+  );
+
+  const onUnSelectAllRow = useCallback(() => {
+    table.onSelectAllRows(false, []);
+  }, [table]);
+
   const onSoftDeleteTeam = useCallback(
     async (team: TGroupTeam) => {
       await deleteTeamById(team.id);
@@ -71,6 +85,21 @@ export function TeamView() {
     },
     [deleteTeamById, refetchTeams]
   );
+
+  const onSoftDeleteTeamById = useCallback(
+    async (id: number) => {
+      await deleteTeamById(id);
+      refetchTeams();
+    },
+    [deleteTeamById, refetchTeams]
+  );
+
+  const onDeleteMultiTeam = useCallback(() => {
+    const teamIds: string[] = table.selected;
+    teamIds.forEach((idString) => onSoftDeleteTeamById(parseInt(idString, 10)));
+
+    onUnSelectAllRow();
+  }, [onSoftDeleteTeamById, table, onUnSelectAllRow]);
 
   const onCreateTeam = useCallback(
     async (fields: TTeamCreateFields) => {
@@ -114,13 +143,14 @@ export function TeamView() {
       </Box>
 
       <Card>
-        <UserTableToolbar
+        <TeamTableToolbar
           numSelected={table.selected.length}
           filterName={filterName}
           onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
             setFilterName(event.target.value);
             table.onResetPage();
           }}
+          onMultiDelete={onDeleteMultiTeam}
         />
 
         <Scrollbar>
@@ -132,12 +162,7 @@ export function TeamView() {
                 rowCount={teams.length}
                 numSelected={table.selected.length}
                 onSort={table.onSort}
-                onSelectAllRows={(checked) =>
-                  table.onSelectAllRows(
-                    checked,
-                    teams.map((team) => team.id.toString())
-                  )
-                }
+                onSelectAllRows={onSelectAllRow}
                 headLabel={[
                   { id: 'name', label: 'Tên phòng ban' },
                   { id: 'hotline', label: 'Hotline' },
