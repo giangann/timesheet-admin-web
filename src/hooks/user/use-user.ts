@@ -18,9 +18,9 @@ export const useGroupUsers = () => {
       if (response.statusCode === 200) {
         setUsers(response.data.users);
       } else {
-        enqueueSnackbar(response.error ?? response.message ?? 'Unknown error', {
-          variant: 'error',
-        });
+        // enqueueSnackbar(response.error ?? response.message ?? 'Unknown error', {
+        //   variant: 'error',
+        // });
       }
     } catch (error: any) {
       enqueueSnackbar(error.message, { variant: 'error' });

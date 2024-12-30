@@ -60,7 +60,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
         await verifyToken();
       } catch (error: any) {
         router.replace('/sign-in');
-        enqueueSnackbar(error?.message ?? 'Lỗi không xác định', { variant: 'error' });
+        // enqueueSnackbar(error?.message ?? 'Lỗi không xác định', { variant: 'error' });
       }
     }
     checkToken();
