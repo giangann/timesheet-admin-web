@@ -25,11 +25,11 @@ import { applyFilter, emptyRows, getComparator, transformUserData } from '../uti
 import { Dialog, DialogContentText, DialogTitle, Grid, IconButton, Tooltip } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useDownloadExcelFile } from 'src/hooks/excel';
+import { useAuth } from 'src/hooks/use-auth';
 import { useDeleteUser, useGroupUsers, useImport } from 'src/hooks/user';
 import { useRouter } from 'src/routes/hooks';
 import { base64ToBlob, saveDownloadedFileBlobFormat } from 'src/utils';
 import type { UserProps } from '../user-table-row';
-import { useAuth } from 'src/hooks/use-auth';
 
 // ----------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ export function UserView() {
   const table = useTable();
   const { enqueueSnackbar } = useSnackbar();
   const { isLoading, users, refetchUsers } = useGroupUsers();
-  const { deleteUserById } = useDeleteUser();
+  const { deleteUserById, deleteUserByIds } = useDeleteUser();
   const { user: userInfo } = useAuth();
   const { isDownloading, onDownloadFile } = useDownloadExcelFile({
     endpoint: '/users/download-example',
@@ -137,14 +137,13 @@ export function UserView() {
   }, [table]);
 
   const onDeleteMultiUser = useCallback(() => {
-    if (!userInfo) return;
+    const userIds: string[] = table.selected;
+    const ids = userIds.map((id) => parseInt(id, 10));
 
-    const myUserId = userInfo.id.toString();
-    const userIds: string[] = table.selected.filter((id) => id !== myUserId);
+    deleteUserByIds(ids);
 
-    userIds.forEach((idString) => onSoftDeleteUserById(parseInt(idString, 10)));
     onUnSelectAllRow();
-  }, [onSoftDeleteUserById, table, onUnSelectAllRow, userInfo]);
+  }, [table, deleteUserByIds, onUnSelectAllRow]);
 
   return (
     <DashboardContent>

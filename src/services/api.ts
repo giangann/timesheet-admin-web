@@ -47,7 +47,12 @@ export const postApi = async (endpoint: string, body?: UnknownObj, customHeader?
   return responseJson;
 };
 
-export const putApi = async (endpoint: string, params?:UnknownObj, body?: UnknownObj, customHeader?: Headers) => {
+export const putApi = async (
+  endpoint: string,
+  params?: UnknownObj,
+  body?: UnknownObj,
+  customHeader?: Headers
+) => {
   const reqHeader = new Headers();
   reqHeader.append('Content-Type', 'application/json');
 
