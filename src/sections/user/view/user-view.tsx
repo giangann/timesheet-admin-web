@@ -26,10 +26,9 @@ import { Dialog, DialogContentText, DialogTitle, Grid, IconButton, Tooltip } fro
 import { useSnackbar } from 'notistack';
 import { useDownloadExcelFile } from 'src/hooks/excel';
 import { useDeleteUser, useGroupUsers, useImport } from 'src/hooks/user';
+import { useRouter } from 'src/routes/hooks';
 import { base64ToBlob, saveDownloadedFileBlobFormat } from 'src/utils';
 import type { UserProps } from '../user-table-row';
-import { TGroupUser } from 'src/types/user';
-import { useRouter } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
 
@@ -113,6 +112,35 @@ export function UserView() {
     [deleteUserById, refetchUsers]
   );
 
+  const onSoftDeleteUserById = useCallback(
+    async (id: number) => {
+      await deleteUserById(id);
+      refetchUsers();
+    },
+    [deleteUserById, refetchUsers]
+  );
+
+  const onSelectAllRow = useCallback(
+    (checked: boolean) => {
+      table.onSelectAllRows(
+        checked,
+        users.map((user) => user.id.toString())
+      );
+    },
+    [users, table]
+  );
+
+  const onUnSelectAllRow = useCallback(() => {
+    table.onSelectAllRows(false, []);
+  }, [table]);
+
+  const onDeleteMultiUser = useCallback(() => {
+    const userIds: string[] = table.selected;
+    userIds.forEach((idString) => onSoftDeleteUserById(parseInt(idString, 10)));
+
+    onUnSelectAllRow();
+  }, [onSoftDeleteUserById, table, onUnSelectAllRow]);
+
   return (
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
@@ -137,6 +165,7 @@ export function UserView() {
             setFilterName(event.target.value);
             table.onResetPage();
           }}
+          onMultiDelete={onDeleteMultiUser}
         />
 
         <Scrollbar>
@@ -148,12 +177,7 @@ export function UserView() {
                 rowCount={users.length}
                 numSelected={table.selected.length}
                 onSort={table.onSort}
-                onSelectAllRows={(checked) =>
-                  table.onSelectAllRows(
-                    checked,
-                    users.map((user) => user.identifyCard)
-                  )
-                }
+                onSelectAllRows={onSelectAllRow}
                 headLabel={[
                   { id: 'name', label: 'Họ tên' },
 
@@ -180,10 +204,10 @@ export function UserView() {
                   )
                   .map((row) => (
                     <UserTableRow
-                      key={row.identifyCard}
+                      key={row.id.toString()}
                       row={row}
-                      selected={table.selected.includes(row.identifyCard)}
-                      onSelectRow={() => table.onSelectRow(row.identifyCard)}
+                      selected={table.selected.includes(row.id.toString())}
+                      onSelectRow={() => table.onSelectRow(row.id.toString())}
                       onDeleteUser={onSoftDeleteUser}
                       onGotoDetail={onGotoUserDetailPage}
                     />

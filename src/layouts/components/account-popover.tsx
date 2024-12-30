@@ -46,7 +46,6 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
 
   const handleClickItem = useCallback(
     (path: string) => {
-      console.log('item clicked', path);
       handleClosePopover();
       router.push(path);
     },
