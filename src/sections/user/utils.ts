@@ -1,3 +1,4 @@
+import { TGroupUser } from 'src/types/user';
 import type { UserProps } from './user-table-row';
 
 // ----------------------------------------------------------------------
@@ -45,6 +46,7 @@ export function getComparator<Key extends keyof any>(
     [key in Key]: number | string;
   }
 ) => number {
+  console.log({ order, orderBy });
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
@@ -60,7 +62,6 @@ type ApplyFilterProps = {
 
 export function applyFilter({ inputData, comparator, filterName }: ApplyFilterProps) {
   const stabilizedThis = inputData.map((el, index) => [el, index] as const);
-
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
     if (order !== 0) return order;
@@ -76,4 +77,23 @@ export function applyFilter({ inputData, comparator, filterName }: ApplyFilterPr
   }
 
   return inputData;
+}
+
+export function transformUserData(users: TGroupUser[]): UserProps[] {
+  return users.map((user) => ({
+    id: user.id,
+    name: user.name,
+    email: user.email ?? '-',
+    address: user.address ?? '-',
+    phone: user.phone ?? '-',
+    identifyCard: user.identifyCard ?? '-',
+    roleName: user.roleName,
+    roleCode: user.roleCode,
+    teamName: user.team.name,
+    teamCode: user.team.code ?? '-',
+    teamHotline: user.team.hotline ?? '-',
+    salaryCoefficient: user.salaryCoefficient ?? '-',
+    positionBonusCoefficient: user.positionBonusCoefficient ?? '-',
+    otherBonusCoefficient: user.otherBonusCoefficient ?? '-',
+  }));
 }

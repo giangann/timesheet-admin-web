@@ -20,11 +20,27 @@ import {
   Tooltip,
 } from '@mui/material';
 import { Iconify } from 'src/components/iconify';
-import { TGroupUser } from 'src/types/user';
 
 // ----------------------------------------------------------------------
 
-export type UserProps = TGroupUser;
+export type UserProps = {
+  id: number;
+  name: string;
+  email: string;
+  address: string;
+  phone: string;
+  identifyCard: string;
+  roleName: string;
+  roleCode: string;
+
+  teamName: string;
+  teamCode: string;
+  teamHotline: string;
+
+  salaryCoefficient: number;
+  positionBonusCoefficient: number;
+  otherBonusCoefficient: number;
+};
 
 type UserTableRowProps = {
   row: UserProps;
@@ -88,17 +104,17 @@ export function UserTableRow({
           </Box>
         </TableCell>
 
-        <TableCell>{row.team.name}</TableCell>
-        <TableCell>{row.team.hotline ?? '-'}</TableCell>
+        <TableCell>{row.teamName}</TableCell>
+        <TableCell>{row.teamHotline}</TableCell>
 
         <TableCell>{row.roleName}</TableCell>
-        <TableCell>{row.phone ?? '-'}</TableCell>
-        <TableCell>{row.address ?? '-'}</TableCell>
-        <TableCell>{row.email ?? '-'}</TableCell>
+        <TableCell>{row.phone}</TableCell>
+        <TableCell>{row.address}</TableCell>
+        <TableCell>{row.email}</TableCell>
 
-        <TableCell>{row.salaryCoefficient ?? '-'}</TableCell>
-        <TableCell>{row.positionBonusCoefficient ?? '-'}</TableCell>
-        <TableCell>{row.otherBonusCoefficient ?? '-'}</TableCell>
+        <TableCell>{row.salaryCoefficient}</TableCell>
+        <TableCell>{row.positionBonusCoefficient}</TableCell>
+        <TableCell>{row.otherBonusCoefficient}</TableCell>
 
         <TableCell align="right">
           <IconButton onClick={handleOpenPopover}>

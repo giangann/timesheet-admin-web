@@ -20,7 +20,7 @@ import { TableNoData } from '../table-no-data';
 import { UserTableHead } from '../user-table-head';
 import { UserTableRow } from '../user-table-row';
 import { UserTableToolbar } from '../user-table-toolbar';
-import { applyFilter, emptyRows, getComparator } from '../utils';
+import { applyFilter, emptyRows, getComparator, transformUserData } from '../utils';
 
 import { Dialog, DialogContentText, DialogTitle, Grid, IconButton, Tooltip } from '@mui/material';
 import { useSnackbar } from 'notistack';
@@ -58,7 +58,7 @@ export function UserView() {
   });
 
   const dataFiltered: UserProps[] = applyFilter({
-    inputData: users,
+    inputData: transformUserData(users),
     comparator: getComparator(table.order, table.orderBy),
     filterName,
   });
@@ -99,14 +99,14 @@ export function UserView() {
   }, [resetImportFileRequest, resetImportResponse]);
 
   const onGotoUserDetailPage = useCallback(
-    (user: TGroupUser) => {
+    (user: UserProps) => {
       router.push(`/nhan-vien/${user.id}`);
     },
     [router]
   );
 
   const onSoftDeleteUser = useCallback(
-    async (user: TGroupUser) => {
+    async (user: UserProps) => {
       await deleteUserById(user.id);
       refetchUsers();
     },
@@ -157,10 +157,10 @@ export function UserView() {
                 headLabel={[
                   { id: 'name', label: 'Họ tên' },
 
-                  { id: 'team', label: 'Phòng ban' },
-                  { id: 'hotline', label: 'Liên hệ phòng' },
+                  { id: 'teamName', label: 'Phòng ban' },
+                  { id: 'teamHotline', label: 'Liên hệ phòng' },
 
-                  { id: 'role', label: 'Chức vụ' },
+                  { id: 'roleName', label: 'Chức vụ' },
                   { id: 'phone', label: 'Số điện thoại', align: 'left' },
                   { id: 'address', label: 'Địa chỉ' },
                   { id: 'email', label: 'Email' },
