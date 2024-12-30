@@ -71,6 +71,36 @@ export function BaseSalaryView() {
     [deleteBaseSalaryById, refetch]
   );
 
+  const onSoftDeleteById = useCallback(
+    async (id: number) => {
+      await deleteBaseSalaryById(id);
+      refetch();
+    },
+    [deleteBaseSalaryById, refetch]
+  );
+
+  const onSelectAllRow = useCallback(
+    (checked: boolean) => {
+      table.onSelectAllRows(
+        checked,
+        baseSalaries.map((el) => el.id.toString())
+      );
+    },
+    [baseSalaries, table]
+  );
+
+  const onUnSelectAllRow = useCallback(() => {
+    table.onSelectAllRows(false, []);
+  }, [table]);
+
+  const onDeleteMultiRecord = useCallback(() => {
+    const ids: string[] = table.selected;
+    ids.forEach((idString) => onSoftDeleteById(parseInt(idString, 10)));
+
+    onUnSelectAllRow();
+  }, [onSoftDeleteById, table, onUnSelectAllRow]);
+
+
   const onCreate = useCallback(
     async (fields: TBaseSalaryCreateFormFields) => {
       // validate
@@ -119,6 +149,7 @@ export function BaseSalaryView() {
             setFilterName(event.target.value);
             table.onResetPage();
           }}
+          onMultiDelete={onDeleteMultiRecord}
         />
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
@@ -129,12 +160,7 @@ export function BaseSalaryView() {
                 rowCount={baseSalaries.length}
                 numSelected={table.selected.length}
                 onSort={table.onSort}
-                onSelectAllRows={(checked) =>
-                  table.onSelectAllRows(
-                    checked,
-                    baseSalaries.map((baseSalary) => baseSalary.id.toString())
-                  )
-                }
+                onSelectAllRows={onSelectAllRow}
                 headLabel={[
                   { id: 'effectiveDate', label: 'Ngày hiệu lực' },
                   { id: 'value', label: 'Giá trị' },
